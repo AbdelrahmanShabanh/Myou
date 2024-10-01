@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link rel="icon" href="../myou/img/photo-output.PNG" type="image/x-icon">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color:  rgb(196, 160, 160);
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .logo {
+  width: 80px;
+  height: 80px;
+}
+
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: auto;
+            box-sizing: border-box;
+        }
+
+        .form-section,
+        .receipt {
+            background-color: white;
+            border: 1px solid #ddd;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            flex: 1;
+            box-sizing: border-box;
+        }
+
+        .form-section {
+            margin-right: 20px;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-group .error-message {
+            color: red;
+            font-size: 0.9rem;
+            position: absolute;
+            left: 0;
+            display: none;
+        }
+
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .receipt-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .receipt-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            border-bottom:  rgb(196, 160, 160) solid;
+        }
+
+        .receipt-item div {
+            flex: 1;
+            min-width: 45%;
+            margin-bottom: 10px;
+        }
+
+        .receipt-total {
+            text-align: right;
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+
+        .receipt-footer {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .payment-info {
+            display: none;
+            margin-top: 10px;
+            color: green;
+            font-weight: bold;
+        }
+
+        #receipt-total{
+             color: green;
+             font-weight: 700;
+             font-size: 20px;
+        }
+
+        .submit-button {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .submit-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* For Chrome, Safari, Edge, and Opera */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* For Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .form-section {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+
+            .receipt {
+                max-width: 100%;
+                padding: 15px;
+            }
+
+            .receipt-header h1 {
+                font-size: 1.6rem;
+            }
+
+            .receipt-item div {
+                min-width: 100%;
+                text-align: left;
+                margin-top: 5px;
+            }
+
+            .receipt-total {
+                text-align: left;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .receipt {
+                padding: 10px;
+            }
+
+            .receipt-header h1 {
+                font-size: 1.4rem;
+            }
+
+            .receipt-total {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-section">
+            <h2>Contact and Delivery Details</h2>
+            <form id="contact-form">
+                <div class="form-group">
+                    <label for="name">Full Name:</label>
+                    <input type="text" id="name" name="name" required>
+                    <span id="name-error" class="error-message">Name must be at least 3 characters long.</span>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address:</label>
+                    <input type="text" id="address" name="address" placeholder="City,Street,Building Number" required>
+                    <span id="address-error" class="error-message">Please enter your detailed address.</span>
+                </div>
+                <div class="form-group">
+                    <label for="phone">WhatsApp Phone Number:</label>
+                    <input type="number" id="phone" name="phone" required>
+                    <span id="phone-error" class="error-message">Phone number must be 11 digits.</span>
+                </div>
+                <div class="form-group">
+                    <label for="city">City:</label>
+                    <input type="text" id="city" name="city" required>
+                    <span id="city-error" class="error-message">Please enter a correct city.</span>
+                </div>
+                <div class="form-group">
+                    <label for="government">Governorate:</label>
+                    <input type="text" id="government" name="government" required>
+                    <span id="government-error" class="error-message">Please enter correct governorate.</span>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                    <span id="email-error" class="error-message">Please enter a valid email address.</span>
+                </div>
+                <h2>Payment Method</h2>
+                <div class="form-group">
+                    <label for="payment-method">Choose Payment Method:</label>
+                    <select id="payment-method" name="payment-method" required>
+                        <option value="cod">Cash on Delivery</option>
+                        <option value="vodafone-cash">Vodafone Cash</option>
+                        <option value="instapay">Instapay</option>
+                    </select>
+                </div>
+                <div id="payment-info" class="payment-info">
+                    Use this number to pay: <span id="payment-number">01008872621</span>
+                </div>
+                <button type="submit" id="submit-button" class="submit-button">Complete Shopping</button>
+            </form>
+        </div>
+
+        <div class="receipt">
+            <a href="#"><img src="img/photo-output.PNG" class="logo" alt=""></a>
+            <div class="receipt-header">
+                <h1>Your Receipt</h1>
+                <p>Thank you for Shopping with MYOU!</p>
+            </div>
+            <div id="receipt-items">
+                <!-- Items will be injected here -->
+            </div>
+            
+            <div class="receipt-total" id="receipt-total">
+                <!-- Total will be injected here -->
+            </div>
+            <div class="receipt-footer">
+                <p>Have a great day!</p>
+            </div>
+        </div>
+    </div>
+    <script src="checkout.js"></script>
+</body>
+</html>

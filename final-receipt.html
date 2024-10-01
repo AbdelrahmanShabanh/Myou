@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Receipt</title>
+    <link rel="icon" href="../myou/img/photo-output.PNG" type="image/x-icon">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color:  rgb(196, 160, 160);
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .logo {
+  width: 80px;
+  height: 80px;
+}
+
+.conferm{
+  font-weight: 600;
+  font-family: 'Times New Roman', Times, serif;
+  display: flex;
+  justify-content: end;
+  justify-items: end;
+}
+
+
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background-color: white;
+            border: 1px solid #ddd;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            font-size: 1.4rem;
+            border-bottom: 2px solid rgb(235, 89, 145);
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+        }
+
+        .receipt-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .receipt-item div {
+            flex: 1;
+            min-width: 45%;
+            margin-bottom: 10px;
+        }
+
+        .receipt-total {
+            text-align: right;
+            font-size: 1.2rem;
+            margin-top: 20px;
+           
+        }
+
+        #receipt-total{
+             color: green;
+             font-weight: 700;
+             font-size: 20px;
+        }
+
+        .receipt-footer {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .contact-details p, .payment-details p {
+            margin: 5px 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .receipt-item div {
+                min-width: 100%;
+                text-align: left;
+            }
+
+            .conferm{
+ 
+  justify-content: center;
+  justify-items: center;
+}
+
+
+            .receipt-total {
+                text-align: left;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .receipt-total {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="#"><img src="img/photo-output.PNG" class="logo" alt=""></a>
+        <div class="conferm">We will send you a message to confirm your order!</div>
+        <div class="section contact-details">
+
+            <h2>Contact and Delivery Details</h2>
+            <p id="full-name"></p>
+            <p id="address"></p>
+            <p id="phone"></p>
+            <p id="email"></p>
+            <p id="city"></p>
+            <p id="government"></p>
+        </div>
+
+        <div class="section payment-details">
+            <h2>Payment Method</h2>
+            <p id="payment-method"></p>
+        </div>
+
+        <div class="section receipt">
+            <h2>Your Receipt</h2>
+            <div id="receipt-items"></div>
+            <div id="receipt-total"></div>
+        </div>
+
+        <div class="receipt-footer">
+            <p>Thank you for shopping with us!</p>
+        </div>
+    </div>
+    <script src="final-receipt.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+
+body {
+  font-family: "Ubuntu", sans-serif;
+  background-color: black;
+}
+/*a*/
+
+
+  
+.login {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+background-image: url(photos/abdos.jpg);
+background-size: cover;
+background-position: center;
+
+}
+
+.form-login {
+  width: 100%;
+  max-width: 500px;
+  padding: 50px;
+  background-color:#000000a3;
+  box-shadow: 0 0 10px rgba(253, 86, 20, 0.7);
+}
+
+.title {
+  margin-bottom: 50px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 2em;
+  color: rgb(214, 35, 0);
+}
+
+.form-group {
+  margin: 20px 0;
+}
+
+input {
+  font-size: 30px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  margin: 5px 0;
+  box-sizing: border-box;
+}
+
+label {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+input:not([type="submit"]) {
+  width: 100%;
+  border: 2px solid rgba(0, 0, 0, 0.7);
+}
+
+input[type="submit"] {
+  background-color: rgb(214, 35, 0);
+  color: white;
+  font-size: 20px;
+}
+input[type="submit"]:hover {
+  cursor: pointer;
+  background-color: rgb(235, 35, 35);
+}
+
+input[type="submit"]:active {
+  background-color: rgb(28, 80, 63);
+}
+
+.error #emailError,
+.error #passwordError {
+  color: red;
+}
+.error input {
+  border: 2px solid red;
+}
+
+.msg {
+  display: none;
+}
+/*c*/
