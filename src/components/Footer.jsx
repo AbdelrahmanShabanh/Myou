@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
@@ -11,43 +11,50 @@ export default function Footer() {
               <span className="logo-front">You</span>
             </div>
             <p className="footer-tagline">Dress Different. Stay M You.</p>
-            <p className="footer-sub">Egypt's freshest men's streetwear brand. Delivering fire fits since 2024.</p>
+            <p className="footer-sub">
+              Premium Handpicked quality, unmatched aesthetic. Delivering fire
+              fits since 2024.
+            </p>
           </div>
 
           <div className="footer-col">
             <h4 className="footer-heading">Shop</h4>
             <ul>
-              <li><Link to="/products?category=modest-wear">Modest Wear</Link></li>
-              <li><Link to="/products?category=swimwear">Swimwear</Link></li>
-              <li><Link to="/products?category=accessories">Accessories</Link></li>
-              <li><Link to="/products">All Products</Link></li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
-            <h4 className="footer-heading">Info</h4>
-            <ul>
-              <li><Link to="/track-order">Track Order</Link></li>
-              <li><a href="#">Size Guide</a></li>
-              <li><a href="#">Returns Policy</a></li>
-              <li><a href="#">Contact Us</a></li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
-            <h4 className="footer-heading">Policies</h4>
-            <ul>
-              <li><span>Payment: Cash on Delivery</span></li>
-              <li><span>Returns: 7 days • Unworn</span></li>
-              <li><span>Cairo delivery: 2-3 days</span></li>
-              <li><span>Alex delivery: 3-4 days</span></li>
+              <li>
+                <Link to="/products?category=modest-wear">Modest Wear</Link>
+              </li>
+              <li>
+                <Link to="/products?category=swimwear">Swimwear</Link>
+              </li>
+              <li>
+                <Link to="/products?category=accessories">Accessories</Link>
+              </li>
+              <li>
+                <Link to="/products">All Products</Link>
+              </li>
             </ul>
           </div>
         </div>
 
         <div className="footer-bottom">
           <p>&copy; {new Date().getFullYear()} M You. All rights reserved.</p>
-          <p>Made with 🔥 in Egypt</p>
+          <p>
+            <a
+              href="https://wa.me/201008872621"
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                color: "var(--accent)",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+            >
+              Made with ❤️ by <span style={{
+                textDecoration:"underline",
+                color:"black"
+              }}>Abdelrahman Shaban</span> 
+            </a>
+          </p>
         </div>
       </div>
 
@@ -92,7 +99,7 @@ export default function Footer() {
           font-weight: 700;
           letter-spacing: 0.12em;
           text-transform: uppercase;
-          color: var(--text-muted);
+          color: #30292e;
           margin-bottom: 1rem;
         }
         .footer-col ul {

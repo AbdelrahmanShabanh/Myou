@@ -97,8 +97,8 @@ export default function FilterSidebar({ filters, onChange }) {
           border: 1px solid var(--border);
           border-radius: var(--radius);
           padding: 1.25rem;
-          position: sticky;
-          top: 80px;
+          position: relative;
+          // top: 80px;
           height: fit-content;
         }
         .filter-header {

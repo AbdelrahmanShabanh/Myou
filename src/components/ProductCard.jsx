@@ -1,13 +1,18 @@
-import { Link } from 'react-router-dom';
-import { useCart } from '../context/CartContext.jsx';
+import { useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext.jsx";
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
+  const navigate = useNavigate();
   const mainImg = product.images?.[0];
   const inStock = product.stock > 0;
 
-  const availableSizes = product.sizes?.filter(s => s.stock > 0) || [];
-  
+  const availableSizes = product.sizes?.filter((s) => s.stock > 0) || [];
+
+  const handleCardClick = (e) => {
+    navigate(`/products/${product._id}`);
+  };
+
   const handleQuickAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -16,27 +21,57 @@ export default function ProductCard({ product }) {
   };
 
   return (
-    <Link to={`/products/${product._id}`} className="product-card">
+    <div
+      onClick={handleCardClick}
+      className="product-card"
+      style={{ cursor: "pointer" }}
+    >
       <div className="product-img-wrap">
         {mainImg ? (
-          <img src={mainImg} alt={product.name} className="product-img" loading="lazy" />
+          <img
+            src={mainImg}
+            alt={product.name}
+            className="product-img"
+            loading="lazy"
+          />
         ) : (
           <div className="product-img-placeholder">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-              <rect x="3" y="3" width="18" height="18" rx="2"/>
-              <path d="m9 9 6 6m0-6-6 6"/>
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <path d="m9 9 6 6m0-6-6 6" />
             </svg>
           </div>
         )}
         {!inStock && <div className="sold-out-overlay">SOLD OUT</div>}
         {product.isOffer ? (
-          <span className="featured-tag" style={{background: 'var(--error)'}}>Sale</span>
+          <span className="featured-tag" style={{ background: "var(--error)" }}>
+            Sale
+          </span>
         ) : product.featured ? (
           <span className="featured-tag">Featured</span>
         ) : null}
-        <button className="quick-add-btn" onClick={handleQuickAdd} disabled={!inStock} title="Quick Add">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="M12 5v14M5 12h14"/>
+        <button
+          className="quick-add-btn"
+          onClick={handleQuickAdd}
+          disabled={!inStock}
+          title="Quick Add"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+          >
+            <path d="M12 5v14M5 12h14" />
           </svg>
         </button>
       </div>
@@ -47,15 +82,30 @@ export default function ProductCard({ product }) {
         <div className="product-footer">
           <span className="product-price">
             {product.isOffer && product.oldPrice && (
-              <span style={{textDecoration:'line-through', color:'var(--text-muted)', fontSize:'0.8rem', marginRight:'0.4rem'}}>{product.oldPrice}</span>
+              <span
+                style={{
+                  textDecoration: "line-through",
+                  color: "var(--text-muted)",
+                  fontSize: "0.8rem",
+                  marginRight: "0.4rem",
+                }}
+              >
+                {product.oldPrice}
+              </span>
             )}
             {product.price} EGP
           </span>
           <div className="size-chips">
-            {availableSizes.slice(0,3).map(s => (
-              <span key={s.size} className="size-chip">{s.size}</span>
+            {availableSizes.slice(0, 3).map((s) => (
+              <span key={s.size} className="size-chip">
+                {s.size}
+              </span>
             ))}
-            {availableSizes.length > 3 && <span className="size-chip-more">+{availableSizes.length - 3}</span>}
+            {availableSizes.length > 3 && (
+              <span className="size-chip-more">
+                +{availableSizes.length - 3}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -209,6 +259,6 @@ export default function ProductCard({ product }) {
           align-self: center;
         }
       `}</style>
-    </Link>
+    </div>
   );
 }
