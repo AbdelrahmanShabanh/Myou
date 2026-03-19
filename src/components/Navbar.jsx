@@ -94,6 +94,7 @@ export default function Navbar() {
           gap: 1.5rem;
         }
         .navbar-logo {
+          width: 100px;
           display: flex;
           align-items: baseline;
           gap: 0.25rem;

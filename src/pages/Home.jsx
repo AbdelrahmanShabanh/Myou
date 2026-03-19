@@ -288,7 +288,7 @@ export default function Home() {
 
         @media (max-width: 768px) {
           .cat-card {
-            height: 350px;
+            height:400px
           }
           .hero-gradient {
             background: linear-gradient(to top, var(--bg) 10%, rgba(13,13,12,0.2) 26%, rgba(13,13,13,0.4) 77%);
