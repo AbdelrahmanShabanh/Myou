@@ -186,12 +186,12 @@ export default function Checkout() {
               <p className="payment-desc">Transfer to <strong>{INSTAPAY_NUMBER}</strong> and upload the screenshot.</p>
               
               {paymentMethod === 'instapay' && (
-                <div style={{marginTop: '1rem', marginLeft: '1.9rem'}}>
-                  <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} style={{fontSize: '0.85rem'}} />
-                  {uploading && <span style={{fontSize: '12px', color: 'var(--accent)', marginLeft: '10px'}}>Processing...</span>}
+                <div className="instapay-upload-area">
+                  <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} className="file-input" />
+                  {uploading && <span className="upload-loading">Processing...</span>}
                   {instapayScreenshot && (
-                    <div style={{marginTop: '10px'}}>
-                      <img src={instapayScreenshot} alt="Screenshot" style={{width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--border)'}} />
+                    <div className="upload-preview">
+                      <img src={instapayScreenshot} alt="Screenshot" />
                     </div>
                   )}
                 </div>
@@ -258,8 +258,13 @@ export default function Checkout() {
         
         .payment-box { background: var(--bg-elevated); border: 2px solid var(--accent); border-radius: var(--radius-sm); padding: 1.25rem; }
         .payment-radio { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; font-weight: 700; font-size: 1rem; }
-        .payment-radio input[type="radio"] { accent-color: var(--accent); width: 18px; height: 18px; cursor: pointer; }
-        .payment-desc { font-size: 0.85rem; color: var(--text-subtle); margin-left: 1.9rem; }
+        .payment-radio input[type="radio"] { accent-color: var(--accent); width: 18px; height: 18px; cursor: pointer; flex-shrink: 0; }
+        .payment-desc { font-size: 0.85rem; color: var(--text-subtle); margin-left: 1.9rem; line-height: 1.4; }
+        
+        .instapay-upload-area { margin-top: 1rem; margin-left: 1.9rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        .file-input { font-size: 0.85rem; max-width: 100%; word-break: break-all; }
+        .upload-loading { font-size: 12px; color: var(--accent); }
+        .upload-preview img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); }
         
         .submit-btn { font-size: 1.1rem; letter-spacing: 0.05em; margin-top: 1rem; }
         
@@ -286,6 +291,11 @@ export default function Checkout() {
           .checkout-grid { grid-template-columns: 1fr; flex-direction: column-reverse; display: flex; gap: 3rem; }
           .checkout-sidebar { position: static; width: 100%; }
           .form-row { flex-direction: column; gap: 0; }
+        }
+        @media (max-width: 480px) {
+          .payment-desc { margin-left: 0; margin-top: 0.5rem; }
+          .instapay-upload-area { margin-left: 0; }
+          .payment-box { padding: 1rem; }
         }
       `}</style>
     </div>

@@ -305,10 +305,19 @@ input, select, textarea {
 }
 
 /* ── Table ── */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .admin-table {
   width: 100%;
+  min-width: 750px;
   border-collapse: collapse;
   font-size: 0.875rem;
+}
+.admin-table th, .admin-table td {
+  white-space: nowrap;
 }
 .admin-table th {
   padding: 0.75rem 1rem;

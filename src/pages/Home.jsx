@@ -7,6 +7,7 @@ export default function Home() {
   const [discounts, setDiscounts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loadingCats, setLoadingCats] = useState(true);
+  const [loadingOffers, setLoadingOffers] = useState(true);
   const [offerProducts, setOfferProducts] = useState([]);
 
   useEffect(() => {
@@ -25,8 +26,11 @@ export default function Home() {
 
     fetch('/api/products')
       .then(r => r.json())
-      .then(data => Array.isArray(data) && setOfferProducts(data.filter(p => p.isOffer)))
-      .catch(() => {});
+      .then(data => {
+        if(Array.isArray(data)) setOfferProducts(data.filter(p => p.isOffer));
+        setLoadingOffers(false);
+      })
+      .catch(() => setLoadingOffers(false));
   }, []);
 
   return (
@@ -46,25 +50,36 @@ export default function Home() {
         </div>
         <div className="hero-bg">
           <div className="hero-gradient" />
-          <img src="/collections/caps.jpg" alt="Streetwear Hero" className="hero-img" />
+          <picture>
+            <source media="(min-width: 768px)" srcSet="/collections/_SHG8409.jpg" />
+            <img src="/collections/caps.jpg" alt="Streetwear Hero" className="hero-img" />
+          </picture>
         </div>
       </section>
 
       <DiscountScroller discounts={discounts} />
 
       {/* Offers Section */}
-      {offerProducts.length > 0 && (
+      {(loadingOffers || offerProducts.length > 0) && (
         <section className="offers-section container" style={{ paddingTop: '5rem' }}>
           <div className="section-header text-center">
             <p className="section-label">Limited Time Only</p>
             <h2 className="section-title">Special Offers</h2>
           </div>
           <div className="offers-scroller">
-            {offerProducts.map(p => (
-              <div key={p._id} className="offer-card-wrapper">
-                <ProductCard product={p} />
-              </div>
-            ))}
+            {loadingOffers ? (
+              Array.from({ length: 4 }).map((_, idx) => (
+                <div key={idx} className="offer-card-wrapper">
+                  <div className="cat-card skeleton" style={{height: '420px', borderRadius: 'var(--radius)'}}></div>
+                </div>
+              ))
+            ) : (
+              offerProducts.map(p => (
+                <div key={p._id} className="offer-card-wrapper">
+                  <ProductCard product={p} />
+                </div>
+              ))
+            )}
           </div>
         </section>
       )}
@@ -103,7 +118,7 @@ export default function Home() {
       <style>{`
         .hero {
           position: relative;
-          min-height: 85vh;
+          min-height: 95vh;
           display: flex;
           align-items: center;
           padding: 6rem 5%;
@@ -210,9 +225,9 @@ export default function Home() {
           height: 350px;
         }
         .skeleton {
-          background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-elevated) 50%, var(--bg-card) 75%);
+          background: linear-gradient(90deg, #f5f5f5 25%, #e8e8e8 50%, #f5f5f5 75%);
           background-size: 200% 100%;
-          animation: skeletonLoading 1.5s infinite;
+          animation: skeletonLoading 1.5s ease-in-out infinite;
         }
         @keyframes skeletonLoading {
           0% { background-position: 200% 0; }

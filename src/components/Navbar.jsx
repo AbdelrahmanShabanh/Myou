@@ -21,8 +21,7 @@ export default function Navbar() {
     <nav className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`}>
       <div className="container navbar-inner">
         <Link to="/" className="navbar-logo">
-          <span className="logo-genz">M </span>
-          <span className="logo-front">You</span>
+         <img src="/collections/Gemini_Generated_Image_uai0qyuai0qyuai0-removebg-preview.png" alt="Logo" className="logo-img" />
         </Link>
 
         <div className="navbar-links">
@@ -74,7 +73,7 @@ export default function Navbar() {
           position: sticky;
           top: 0;
           z-index: 100;
-         background: rgba(253, 232, 243,  0.6);
+         background: rgb(199 199 199 / 60%);
           backdrop-filter: blur(10px);
           border-bottom-color: #f8a8d089;
           box-shadow: 0 4px 24px rgba(0,0,0,0.1);
@@ -120,7 +119,7 @@ export default function Navbar() {
           padding: 0.45rem 0.85rem;
           font-size: 0.88rem;
           font-weight: 500;
-          color: var(--text-muted);
+          color: #ffff;
           border-radius: var(--radius-sm);
           transition: var(--transition);
           text-decoration: none;
