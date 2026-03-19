@@ -25,7 +25,7 @@ export default function AdminOrders() {
     setOrders(prev => prev.map(o => o._id === id ? { ...o, status: newStatus } : o));
 
     try {
-      const res = await fetch(`/api/admin/orders/${id}`, {
+      const res = await fetch(`/api/admin/orders?id=${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ status: newStatus })

@@ -112,7 +112,7 @@ export default function AdminProducts() {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
     const token = localStorage.getItem('myou_admin_token');
     try {
-      await fetch(`/api/products/${id}`, {
+      await fetch(`/api/products?id=${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -125,7 +125,7 @@ export default function AdminProducts() {
     setSaving(true);
     const token = localStorage.getItem('myou_admin_token');
     
-    const url = editId ? `/api/products/${editId}` : '/api/products';
+    const url = editId ? `/api/products?id=${editId}` : '/api/products';
     const method = editId ? 'PUT' : 'POST';
 
     try {

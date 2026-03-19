@@ -27,7 +27,7 @@ export default function OrderTracking() {
     setSearchParams({ id });
 
     try {
-      const res = await fetch(`/api/orders/${id}`);
+      const res = await fetch(`/api/orders?id=${id}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Order not found');
       setOrder(data);

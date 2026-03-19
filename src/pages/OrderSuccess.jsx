@@ -12,7 +12,7 @@ export default function OrderSuccess() {
   useEffect(() => {
     if (orderId) {
       clearCart(); // clear cart on successful order
-      fetch(`/api/orders/${orderId}`)
+      fetch(`/api/orders?id=${orderId}`)
         .then(res => res.json())
         .then(data => {
           setOrder(data);

@@ -78,7 +78,7 @@ export default function AdminCategories() {
     if (!window.confirm('Are you sure you want to delete this category?')) return;
     const token = localStorage.getItem('myou_admin_token');
     try {
-      const res = await fetch(`/api/categories/${id}`, {
+      const res = await fetch(`/api/categories?id=${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -93,7 +93,7 @@ export default function AdminCategories() {
   const toggleActive = async (cat) => {
     const token = localStorage.getItem('myou_admin_token');
     try {
-      await fetch(`/api/categories/${cat._id}`, {
+      await fetch(`/api/categories?id=${cat._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ active: !cat.active })
@@ -108,7 +108,7 @@ export default function AdminCategories() {
     e.preventDefault();
     const token = localStorage.getItem('myou_admin_token');
     
-    const url = editId ? `/api/categories/${editId}` : '/api/categories';
+    const url = editId ? `/api/categories?id=${editId}` : '/api/categories';
     const method = editId ? 'PUT' : 'POST';
     
     try {

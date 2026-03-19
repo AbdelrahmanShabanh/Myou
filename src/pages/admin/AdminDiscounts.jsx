@@ -85,7 +85,7 @@ export default function AdminDiscounts() {
     if (!window.confirm('Are you sure you want to delete this discount?')) return;
     const token = localStorage.getItem('myou_admin_token');
     try {
-      const res = await fetch(`/api/discounts/${id}`, {
+      const res = await fetch(`/api/discounts?id=${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -100,7 +100,7 @@ export default function AdminDiscounts() {
   const toggleActive = async (d) => {
     const token = localStorage.getItem('myou_admin_token');
     try {
-      await fetch(`/api/discounts/${d._id}`, {
+      await fetch(`/api/discounts?id=${d._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ active: !d.active })
@@ -115,7 +115,7 @@ export default function AdminDiscounts() {
     e.preventDefault();
     const token = localStorage.getItem('myou_admin_token');
     
-    const url = editId ? `/api/discounts/${editId}` : '/api/discounts';
+    const url = editId ? `/api/discounts?id=${editId}` : '/api/discounts';
     const method = editId ? 'PUT' : 'POST';
     
     try {
