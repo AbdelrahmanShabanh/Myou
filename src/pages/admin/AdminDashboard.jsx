@@ -1,49 +1,66 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({ products: 0, orders: 0 });
-  const [revenue, setRevenue] = useState({ totalRevenue: 0, monthlyRevenue: 0, weeklyRevenue: 0 });
+  const [revenue, setRevenue] = useState({
+    totalRevenue: 0,
+    monthlyRevenue: 0,
+    weeklyRevenue: 0,
+  });
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('myou_admin_token');
-    
+    const token = localStorage.getItem("myou_admin_token");
+
     Promise.all([
-      fetch('/api/products').then(res => res.json()),
-      fetch('/api/admin/orders', { headers: { 'Authorization': `Bearer ${token}` } }).then(res => {
-        if(res.status === 401) {
-          localStorage.removeItem('myou_admin_token');
-          navigate('/admin/login');
-          throw new Error('Unauthorized');
+      fetch("/api/products").then((res) => res.json()),
+      fetch("/api/admin/orders", {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then(async (res) => {
+        if (res.status === 401) {
+          localStorage.removeItem("myou_admin_token");
+          navigate("/admin/login");
+          throw new Error("Unauthorized");
+        }
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error("API error: " + res.status + " " + text);
         }
         return res.json();
       }),
-      fetch('/api/admin/revenue', { headers: { 'Authorization': `Bearer ${token}` } }).then(res => res.ok ? res.json() : null)
+      fetch("/api/admin/revenue", {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then((res) => (res.ok ? res.json() : null)),
     ])
-    .then(([productsData, ordersData, revenueData]) => {
-      setStats({
-        products: productsData.length,
-        orders: ordersData.length
+      .then(([productsData, ordersData, revenueData]) => {
+        setStats({
+          products: Array.isArray(productsData) ? productsData.length : 0,
+          orders: Array.isArray(ordersData) ? ordersData.length : 0,
+        });
+        if (revenueData) setRevenue(revenueData);
+        setRecentOrders(Array.isArray(ordersData) ? ordersData.slice(0, 5) : []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
       });
-      if (revenueData) setRevenue(revenueData);
-      setRecentOrders(ordersData.slice(0, 5));
-      setLoading(false);
-    })
-    .catch(err => {
-      console.error(err);
-      setLoading(false);
-    });
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('myou_admin_token');
-    window.location.href = '/';
+    localStorage.removeItem("myou_admin_token");
+    window.location.href = "/";
   };
 
-  if (loading) return <div className="page-loader"><div className="spinner"/></div>;
+  if (loading)
+    return (
+      <div className="page-loader">
+        <div className="spinner" />
+      </div>
+    );
 
   return (
     <div className="admin-page container">
@@ -58,37 +75,78 @@ export default function AdminDashboard() {
         <div className="stat-card">
           <h3 className="stat-title">Total Products</h3>
           <p className="stat-value">{stats.products}</p>
-          <Link to="/admin/products" className="stat-link">Manage Products →</Link>
+          <Link to="/admin/products" className="stat-link">
+            Manage Products →
+          </Link>
         </div>
         <div className="stat-card">
           <h3 className="stat-title">Total Orders</h3>
           <p className="stat-value">{stats.orders}</p>
-          <Link to="/admin/orders" className="stat-link">Manage Orders →</Link>
+          <Link to="/admin/orders" className="stat-link">
+            Manage Orders →
+          </Link>
         </div>
         <div className="stat-card">
           <h3 className="stat-title">Categories</h3>
-          <p className="stat-value" style={{fontSize: '2rem'}}>—</p>
-          <Link to="/admin/categories" className="stat-link">Manage Categories →</Link>
+          <p className="stat-value" style={{ fontSize: "2rem" }}>
+            —
+          </p>
+          <Link to="/admin/categories" className="stat-link">
+            Manage Categories →
+          </Link>
         </div>
         <div className="stat-card">
           <h3 className="stat-title">Discounts</h3>
-          <p className="stat-value" style={{fontSize: '2rem'}}>—</p>
-          <Link to="/admin/discounts" className="stat-link">Manage Discounts →</Link>
+          <p className="stat-value" style={{ fontSize: "2rem" }}>
+            —
+          </p>
+          <Link to="/admin/discounts" className="stat-link">
+            Manage Discounts →
+          </Link>
         </div>
         <div className="stat-card revenue-card">
-          <h3 className="stat-title" style={{color: 'rgba(255,255,255,0.8)'}}>Total Revenue</h3>
-          <p className="stat-value" style={{color: '#fff'}}>{revenue.totalRevenue} EGP</p>
-          <div style={{display: 'flex', gap: '1rem', marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.2)', fontSize: '0.8rem', color: 'rgba(255,255,255,0.9)'}}>
-            <div><strong>30d:</strong> {revenue.monthlyRevenue} EGP</div>
-            <div><strong>7d:</strong> {revenue.weeklyRevenue} EGP</div>
+          <h3 className="stat-title" style={{ color: "rgba(255,255,255,0.8)" }}>
+            Total Revenue
+          </h3>
+          <p className="stat-value" style={{ color: "#fff" }}>
+            {revenue.totalRevenue} EGP
+          </p>
+          <div
+            style={{
+              display: "flex",
+              gap: "1rem",
+              marginTop: "auto",
+              paddingTop: "1rem",
+              borderTop: "1px solid rgba(255,255,255,0.2)",
+              fontSize: "0.8rem",
+              color: "rgba(255,255,255,0.9)",
+            }}
+          >
+            <div>
+              <strong>30d:</strong> {revenue.monthlyRevenue} EGP
+            </div>
+            <div>
+              <strong>7d:</strong> {revenue.weeklyRevenue} EGP
+            </div>
           </div>
         </div>
       </div>
 
       <div className="admin-section">
         <div className="section-head">
-          <h2 className="section-label" style={{fontSize: '1rem', color: 'var(--text)'}}>Recent Orders</h2>
-          <Link to="/admin/orders" className="nav-link" style={{fontSize:'0.85rem'}}>View All</Link>
+          <h2
+            className="section-label"
+            style={{ fontSize: "1rem", color: "var(--text)" }}
+          >
+            Recent Orders
+          </h2>
+          <Link
+            to="/admin/orders"
+            className="nav-link"
+            style={{ fontSize: "0.85rem" }}
+          >
+            View All
+          </Link>
         </div>
 
         <div className="table-responsive">
@@ -104,18 +162,33 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {recentOrders.map(order => (
+              {recentOrders.map((order) => (
                 <tr key={order._id}>
-                  <td><span className="mono-id">{order._id.substring(0,8)}</span></td>
+                  <td>
+                    <span className="mono-id">{order._id.substring(0, 8)}</span>
+                  </td>
                   <td>{order.customerName}</td>
                   <td>{order.city}</td>
-                  <td><strong>{order.total} EGP</strong></td>
-                  <td><span className={`badge badge-${order.status}`}>{order.status}</span></td>
+                  <td>
+                    <strong>{order.total} EGP</strong>
+                  </td>
+                  <td>
+                    <span className={`badge badge-${order.status}`}>
+                      {order.status}
+                    </span>
+                  </td>
                   <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                 </tr>
               ))}
               {recentOrders.length === 0 && (
-                <tr><td colSpan="6" style={{textAlign:'center', padding:'2rem'}}>No orders yet.</td></tr>
+                <tr>
+                  <td
+                    colSpan="6"
+                    style={{ textAlign: "center", padding: "2rem" }}
+                  >
+                    No orders yet.
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

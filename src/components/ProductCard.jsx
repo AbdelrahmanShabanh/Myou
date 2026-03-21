@@ -5,10 +5,10 @@ export default function ProductCard({ product }) {
   const { addToCart } = useCart();
   const navigate = useNavigate();
   const mainImg = product.images?.[0];
-  
+
   const hasSizes = product.sizes && product.sizes.length > 0;
-  const inStock = hasSizes 
-    ? product.sizes.some(s => s.stock > 0)
+  const inStock = hasSizes
+    ? product.sizes.some((s) => s.stock > 0)
     : product.stock > 0;
 
   const availableSizes = product.sizes?.filter((s) => s.stock > 0) || [];

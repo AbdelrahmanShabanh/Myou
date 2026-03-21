@@ -43,6 +43,10 @@ export default function Checkout() {
   const [submitted, setSubmitted] = useState(false);
   const [showReturnPolicy, setShowReturnPolicy] = useState(false);
   const [hasClickedInstapay, setHasClickedInstapay] = useState(false);
+  const [discountCode, setDiscountCode] = useState("");
+  const [appliedDiscount, setAppliedDiscount] = useState(null);
+  const [discountError, setDiscountError] = useState("");
+  const [isApplying, setIsApplying] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -56,8 +60,40 @@ export default function Checkout() {
   if (items.length === 0 && !submitted) return null;
 
   const total = cartTotal;
+  const discountValue = appliedDiscount ? (total * (appliedDiscount.discountPercent / 100)) : 0;
+  const totalAfterDiscount = total - discountValue;
   const deliveryFee = form.governorate ? (GOV_FEES[form.governorate] || 110) : 0;
-  const finalTotal = total + deliveryFee;
+  const finalTotal = totalAfterDiscount + deliveryFee;
+
+  const handleApplyDiscount = async () => {
+    if (!discountCode.trim()) return;
+    setIsApplying(true);
+    setDiscountError("");
+    try {
+      const res = await fetch("/api/discounts");
+      const discounts = await res.json();
+      const validDiscount = discounts.find(
+        (d) => d.code && d.code.toLowerCase() === discountCode.trim().toLowerCase()
+      );
+
+      if (validDiscount) {
+        setAppliedDiscount(validDiscount);
+      } else {
+        setDiscountError("Invalid or expired discount code.");
+        setAppliedDiscount(null);
+      }
+    } catch (err) {
+      setDiscountError("Error verifying discount code.");
+    } finally {
+      setIsApplying(false);
+    }
+  };
+
+  const removeDiscount = () => {
+    setAppliedDiscount(null);
+    setDiscountCode("");
+    setDiscountError("");
+  };
 
   const validate = () => {
     const errs = {};
@@ -78,17 +114,23 @@ export default function Checkout() {
     const payment = paymentMethod === "cash" ? "Cash on Delivery" : "Instapay (redirected)";
 
     let msgStr = `*New Order from ${form.fullName}*\n\n`;
-    
-    return (
+    let body = 
       msgStr +
       `*Contact:*\n📞 ${form.phone}\n\n` +
       `*Address:*\n📍 ${govLabel}\n🏠 ${form.address}\n\n` +
       `📦 *Order Items*\n${itemLines}\n\n` +
-      `💰 *Subtotal: LE ${total.toFixed(2)}*\n` +
+      `💰 *Subtotal: LE ${total.toFixed(2)}*\n`;
+      
+    if (appliedDiscount) {
+      body += `🏷️ *Discount (${appliedDiscount.code} - ${appliedDiscount.discountPercent}%): -LE ${discountValue.toFixed(2)}*\n`;
+    }
+
+    body += 
       `🚚 *Delivery Fee: LE ${deliveryFee.toFixed(2)}*\n` +
       `💰 *Total: LE ${finalTotal.toFixed(2)}*\n` +
-      `💳 *Payment Method:* ${payment}`
-    );
+      `💳 *Payment Method:* ${payment}`;
+
+    return body;
   };
 
   const handleSubmit = async (e) => {
@@ -129,7 +171,8 @@ export default function Checkout() {
           address: form.address,
           items: orderItems,
           total: finalTotal,
-          paymentMethod,
+          paymentMethod: paymentMethod === 'cash' ? 'cash_on_delivery' : 'instapay',
+          notes: appliedDiscount ? `Discount Applied: ${appliedDiscount.code} (-${appliedDiscount.discountPercent}%)` : "",
         })
       });
     } catch (err) {
@@ -353,10 +396,60 @@ export default function Checkout() {
 
           <div style={{height:'1px', background:'var(--border)', margin:'1.5rem 0'}} />
 
+          {/* Discount Code Section */}
+          <div style={{ marginBottom: "1.5rem" }}>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <input
+                type="text"
+                placeholder="Discount code"
+                value={discountCode}
+                onChange={(e) => setDiscountCode(e.target.value)}
+                disabled={!!appliedDiscount || isApplying}
+                className="form-input"
+                style={{
+                  flex: 1,
+                  padding: "0.75rem",
+                  borderRadius: "var(--radius-sm)",
+                  border: "1px solid var(--border)",
+                  background: "var(--bg-elevated)",
+                  color: "var(--text)"
+                }}
+              />
+              <button
+                type="button"
+                onClick={appliedDiscount ? removeDiscount : handleApplyDiscount}
+                disabled={(!discountCode.trim() && !appliedDiscount) || isApplying}
+                className="btn btn-primary"
+                style={{
+                  padding: "0.75rem 1.25rem",
+                  borderRadius: "var(--radius-sm)",
+                  background: appliedDiscount ? "var(--error)" : "var(--text)",
+                  color: appliedDiscount ? "#fff" : "var(--bg)",
+                  border: "none",
+                  fontWeight: "bold",
+                  cursor: ((!discountCode.trim() && !appliedDiscount) || isApplying) ? "not-allowed" : "pointer",
+                  opacity: ((!discountCode.trim() && !appliedDiscount) || isApplying) ? 0.7 : 1,
+                }}
+              >
+                {isApplying ? "..." : appliedDiscount ? "Remove" : "Apply"}
+              </button>
+            </div>
+            {discountError && <span style={{ color: "var(--error)", fontSize: "0.8rem", marginTop: "0.5rem", display: "block" }}>{discountError}</span>}
+            {appliedDiscount && <span style={{ color: "var(--success)", fontSize: "0.8rem", marginTop: "0.5rem", display: "block" }}>{appliedDiscount.code} applied (-{appliedDiscount.discountPercent}%)</span>}
+          </div>
+
           <div style={{display:'flex', justifyContent:'space-between', marginBottom:'1rem', fontSize:'0.95rem'}}>
             <span style={{color:'var(--text-muted)'}}>Subtotal</span>
             <span style={{fontWeight:600}}>LE {total.toFixed(2)}</span>
           </div>
+
+          {appliedDiscount && (
+            <div style={{display:'flex', justifyContent:'space-between', marginBottom:'1rem', fontSize:'0.95rem', color: 'var(--success)'}}>
+              <span>Discount</span>
+              <span style={{fontWeight:600}}>-LE {discountValue.toFixed(2)}</span>
+            </div>
+          )}
+
           <div style={{display:'flex', justifyContent:'space-between', marginBottom:'1.5rem', fontSize:'0.95rem'}}>
             <span style={{color:'var(--text-muted)'}}>Shipping</span>
             {deliveryFee === 0 && !form.governorate ? (

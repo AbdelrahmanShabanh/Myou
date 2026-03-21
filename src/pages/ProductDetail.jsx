@@ -1,30 +1,30 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext.jsx';
+import { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext.jsx";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  
+  const [error, setError] = useState("");
+
   const [mainImage, setMainImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedSize, setSelectedSize] = useState("");
   const [sizeError, setSizeError] = useState(false);
 
   useEffect(() => {
     setLoading(true);
     fetch(`/api/products?id=${id}`)
-      .then(res => {
-        if (!res.ok) throw new Error('Product not found');
+      .then((res) => {
+        if (!res.ok) throw new Error("Product not found");
         return res.json();
       })
-      .then(data => {
+      .then((data) => {
         setProduct(data);
-        const availableSizes = data.sizes?.filter(s => s.stock > 0) || [];
+        const availableSizes = data.sizes?.filter((s) => s.stock > 0) || [];
         if (availableSizes.length > 0) {
           setSelectedSize(availableSizes[0].size);
         } else if (data.sizes && data.sizes.length > 0) {
@@ -32,7 +32,7 @@ export default function ProductDetail() {
         }
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         setError(err.message);
         setLoading(false);
       });
@@ -45,42 +45,65 @@ export default function ProductDetail() {
     }
     setSizeError(false);
     addToCart(product, selectedSize);
-    
+
     // Show quick toast
-    const btn = document.getElementById('add-btn');
+    const btn = document.getElementById("add-btn");
     const originalText = btn.innerText;
-    btn.innerText = 'Added to Cart! ✓';
-    btn.style.backgroundColor = 'var(--success)';
-    btn.style.color = '#fff';
+    btn.innerText = "Added to Cart! ✓";
+    btn.style.backgroundColor = "var(--success)";
+    btn.style.color = "#fff";
     setTimeout(() => {
       if (btn) {
         btn.innerText = originalText;
-        btn.style.backgroundColor = '';
-        btn.style.color = '';
+        btn.style.backgroundColor = "";
+        btn.style.color = "";
       }
     }, 2000);
   };
 
-  if (loading) return <div className="page-loader"><div className="spinner" /></div>;
-  if (error) return (
-    <div className="container" style={{padding: '5rem 0'}}>
-      <div className="alert alert-error">{error}</div>
-      <Link to="/products" className="btn btn-primary" style={{marginTop: '1rem'}}>Back to Shop</Link>
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="page-loader">
+        <div className="spinner" />
+      </div>
+    );
+  if (error)
+    return (
+      <div className="container" style={{ padding: "5rem 0" }}>
+        <div className="alert alert-error">{error}</div>
+        <Link
+          to="/products"
+          className="btn btn-primary"
+          style={{ marginTop: "1rem" }}
+        >
+          Back to Shop
+        </Link>
+      </div>
+    );
   if (!product) return null;
 
   const hasSizes = product.sizes && product.sizes.length > 0;
-  const selectedSizeObj = product.sizes?.find(s => s.size === selectedSize);
-  const inStock = hasSizes ? (selectedSizeObj ? selectedSizeObj.stock > 0 : false) : product.stock > 0;
-  const displayStock = hasSizes && selectedSizeObj ? selectedSizeObj.stock : product.stock;
+  const selectedSizeObj = product.sizes?.find((s) => s.size === selectedSize);
+  const inStock = hasSizes
+    ? selectedSizeObj
+      ? selectedSizeObj.stock > 0
+      : false
+    : product.stock > 0;
+  const displayStock =
+    hasSizes && selectedSizeObj ? selectedSizeObj.stock : product.stock;
 
   return (
     <div className="product-detail-page container">
       <div className="breadcrumb">
-        <Link to="/">Home</Link> <span className="sep">/</span> 
-        <Link to="/products">Shop</Link> <span className="sep">/</span> 
-        <Link to={`/products?category=${product.category}`} style={{textTransform:'capitalize'}}>{product.category}</Link> <span className="sep">/</span> 
+        <Link to="/">Home</Link> <span className="sep">/</span>
+        <Link to="/products">Shop</Link> <span className="sep">/</span>
+        <Link
+          to={`/products?category=${product.category}`}
+          style={{ textTransform: "capitalize" }}
+        >
+          {product.category}
+        </Link>{" "}
+        <span className="sep">/</span>
         <span className="current">{product.name}</span>
       </div>
 
@@ -88,19 +111,27 @@ export default function ProductDetail() {
         {/* Images */}
         <div className="detail-gallery">
           <div className="main-image-wrap">
-            <img src={product.images?.[mainImage] || ''} alt={product.name} className="main-image" />
+            <img
+              src={product.images?.[mainImage] || ""}
+              alt={product.name}
+              className="main-image"
+            />
             {!inStock && <div className="sold-out-badge">SOLD OUT</div>}
             {product.featured && <div className="featured-badge">FEATURED</div>}
           </div>
           {product.images?.length > 1 && (
             <div className="thumb-strip">
               {product.images.map((img, i) => (
-                <button 
-                  key={i} 
-                  className={`thumb-btn ${mainImage === i ? 'active' : ''}`}
+                <button
+                  key={i}
+                  className={`thumb-btn ${mainImage === i ? "active" : ""}`}
                   onClick={() => setMainImage(i)}
                 >
-                  <img src={img} alt={`Thumbnail ${i+1}`} className="thumb-img" />
+                  <img
+                    src={img}
+                    alt={`Thumbnail ${i + 1}`}
+                    className="thumb-img"
+                  />
                 </button>
               ))}
             </div>
@@ -111,12 +142,16 @@ export default function ProductDetail() {
         <div className="detail-info">
           <h1 className="detail-title">{product.name}</h1>
           <p className="detail-price">{product.price} EGP</p>
-          
+
           <p className="detail-desc">{product.description}</p>
-          
+
           <div className="detail-stock">
-            <span className={`status-dot ${inStock ? 'in-stock' : 'out-stock'}`} />
-            {inStock ? `${displayStock} items available` : 'Currently out of stock'}
+            <span
+              className={`status-dot ${inStock ? "in-stock" : "out-stock"}`}
+            />
+            {inStock
+              ? `${displayStock} items available`
+              : "Currently out of stock"}
           </div>
 
           <div className="detail-section">
@@ -125,33 +160,43 @@ export default function ProductDetail() {
               <button className="size-guide-btn">Size Guide</button>
             </div>
             <div className="size-selector">
-              {product.sizes?.map(sizeObj => (
+              {product.sizes?.map((sizeObj) => (
                 <button
                   key={sizeObj.size}
-                  className={`size-btn-lg ${selectedSize === sizeObj.size ? 'active' : ''}`}
-                  onClick={() => { setSelectedSize(sizeObj.size); setSizeError(false); }}
+                  className={`size-btn-lg ${selectedSize === sizeObj.size ? "active" : ""}`}
+                  onClick={() => {
+                    setSelectedSize(sizeObj.size);
+                    setSizeError(false);
+                  }}
                   disabled={sizeObj.stock <= 0}
                 >
                   {sizeObj.size}
                 </button>
               ))}
             </div>
-            {sizeError && <p className="error-text">Please select a size before adding to cart.</p>}
+            {sizeError && (
+              <p className="error-text">
+                Please select a size before adding to cart.
+              </p>
+            )}
           </div>
 
           <div className="detail-actions">
-            <button 
+            <button
               id="add-btn"
-              className="btn btn-primary btn-lg full-width" 
+              className="btn btn-primary btn-lg full-width"
               onClick={handleAdd}
               disabled={!inStock}
             >
-              {inStock ? 'Add to Cart' : 'Out of Stock'}
+              {inStock ? "Add to Cart" : "Out of Stock"}
             </button>
-            <button 
+            <button
               className="btn btn-dark btn-lg full-width"
               onClick={() => {
-                if(inStock) { handleAdd(); navigate('/checkout'); }
+                if (inStock) {
+                  handleAdd();
+                  navigate("/checkout");
+                }
               }}
               disabled={!inStock}
             >
@@ -168,15 +213,28 @@ export default function ProductDetail() {
             )}
             <div className="meta-item">
               <span className="meta-label">Category</span>
-              <span className="meta-value" style={{textTransform:'capitalize'}}>{product.category}</span>
+              <span
+                className="meta-value"
+                style={{ textTransform: "capitalize" }}
+              >
+                {product.category}
+              </span>
             </div>
           </div>
-          
+
           <div className="shipping-banner">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11"/>
-              <path d="M14 9h4l4 4v5c0 .6-.4 1-1 1h-2"/>
-              <circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11" />
+              <path d="M14 9h4l4 4v5c0 .6-.4 1-1 1h-2" />
+              <circle cx="7" cy="18" r="2" />
+              <circle cx="17" cy="18" r="2" />
             </svg>
             <div>
               <strong>Fast Delivery</strong>
