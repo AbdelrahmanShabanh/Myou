@@ -1,33 +1,45 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from "react";
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('myou_cart')) || [];
+      return JSON.parse(localStorage.getItem("myou_cart")) || [];
     } catch {
       return [];
     }
   });
 
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const toggleCart = () => setIsCartOpen(prev => !prev);
+  const toggleCart = () => setIsCartOpen((prev) => !prev);
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
 
   useEffect(() => {
-    localStorage.setItem('myou_cart', JSON.stringify(items));
+    localStorage.setItem("myou_cart", JSON.stringify(items));
   }, [items]);
 
   const addToCart = (product, size) => {
-    setItems(prev => {
-      const existing = prev.find(i => i.product._id === product._id && i.size === size);
+    setItems((prev) => {
+      let maxStock = product.stock;
+      if (product.sizes && product.sizes.length > 0) {
+        const sizeObj = product.sizes.find((s) => s.size === size);
+        if (sizeObj) maxStock = sizeObj.stock;
+      }
+
+      if (maxStock <= 0) return prev; // Do not add
+
+      const existing = prev.find(
+        (i) => i.product._id === product._id && i.size === size,
+      );
       if (existing) {
-        return prev.map(i =>
+        if (existing.qty >= maxStock) return prev; // Prevent adding more than stock
+
+        return prev.map((i) =>
           i.product._id === product._id && i.size === size
             ? { ...i, qty: i.qty + 1 }
-            : i
+            : i,
         );
       }
       return [...prev, { product, size, qty: 1 }];
@@ -36,7 +48,9 @@ export function CartProvider({ children }) {
   };
 
   const removeFromCart = (productId, size) => {
-    setItems(prev => prev.filter(i => !(i.product._id === productId && i.size === size)));
+    setItems((prev) =>
+      prev.filter((i) => !(i.product._id === productId && i.size === size)),
+    );
   };
 
   const updateQty = (productId, size, newQty) => {
@@ -44,10 +58,19 @@ export function CartProvider({ children }) {
       removeFromCart(productId, size);
       return;
     }
-    setItems(prev =>
-      prev.map(i =>
-        i.product._id === productId && i.size === size ? { ...i, qty: newQty } : i
-      )
+    setItems((prev) =>
+      prev.map((i) => {
+        if (i.product._id === productId && i.size === size) {
+          let maxStock = i.product.stock;
+          if (i.product.sizes && i.product.sizes.length > 0) {
+            const sizeObj = i.product.sizes.find((s) => s.size === size);
+            if (sizeObj) maxStock = sizeObj.stock;
+          }
+          const finalQty = Math.min(newQty, maxStock);
+          return { ...i, qty: finalQty };
+        }
+        return i;
+      }),
     );
   };
 
@@ -57,7 +80,21 @@ export function CartProvider({ children }) {
   const cartCount = items.reduce((sum, i) => sum + i.qty, 0);
 
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQty, clearCart, cartTotal, cartCount, isCartOpen, toggleCart, openCart, closeCart }}>
+    <CartContext.Provider
+      value={{
+        items,
+        addToCart,
+        removeFromCart,
+        updateQty,
+        clearCart,
+        cartTotal,
+        cartCount,
+        isCartOpen,
+        toggleCart,
+        openCart,
+        closeCart,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

@@ -52,7 +52,6 @@ export default function AdminDashboard() {
           <h1 className="section-title">Admin Dashboard</h1>
           <p className="admin-sub">Store overview and recent activity</p>
         </div>
-        <button className="btn btn-outline" onClick={handleLogout}>Logout</button>
       </div>
 
       <div className="stats-grid">

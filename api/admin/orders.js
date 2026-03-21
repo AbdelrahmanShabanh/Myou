@@ -1,4 +1,4 @@
-import { connectDB, Order } from '../_lib/db.js';
+import { connectDB, Order, Product } from '../_lib/db.js';
 import { verifyAdmin } from '../_lib/auth.js';
 
 export default async function handler(req, res) {
@@ -22,8 +22,42 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Invalid status' });
       }
 
-      const order = await Order.findByIdAndUpdate(id, { status }, { new: true });
+      const order = await Order.findById(req.query.id || req.body.id);
       if (!order) return res.status(404).json({ error: 'Order not found' });
+
+      const oldStatus = order.status;
+      order.status = status;
+      await order.save();
+
+      if (oldStatus !== 'cancelled' && status === 'cancelled') {
+        for (const item of order.items) {
+          if (item.productId && item.size) {
+            await Product.updateOne(
+              { _id: item.productId, "sizes.size": item.size },
+              { $inc: { "stock": item.qty, "sizes.$.stock": item.qty } }
+            );
+          } else if (item.productId && !item.size) {
+            await Product.updateOne(
+              { _id: item.productId },
+              { $inc: { "stock": item.qty } }
+            );
+          }
+        }
+      } else if (oldStatus === 'cancelled' && status !== 'cancelled') {
+        for (const item of order.items) {
+          if (item.productId && item.size) {
+            await Product.updateOne(
+              { _id: item.productId, "sizes.size": item.size },
+              { $inc: { "stock": -item.qty, "sizes.$.stock": -item.qty } }
+            );
+          } else if (item.productId && !item.size) {
+            await Product.updateOne(
+              { _id: item.productId },
+              { $inc: { "stock": -item.qty } }
+            );
+          }
+        }
+      }
 
       return res.status(200).json(order);
     }

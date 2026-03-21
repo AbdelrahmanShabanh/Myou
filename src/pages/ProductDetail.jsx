@@ -25,8 +25,10 @@ export default function ProductDetail() {
       .then(data => {
         setProduct(data);
         const availableSizes = data.sizes?.filter(s => s.stock > 0) || [];
-        if (availableSizes.length) {
+        if (availableSizes.length > 0) {
           setSelectedSize(availableSizes[0].size);
+        } else if (data.sizes && data.sizes.length > 0) {
+          setSelectedSize(data.sizes[0].size); // Just pick first if all out of stock
         }
         setLoading(false);
       })
@@ -68,8 +70,10 @@ export default function ProductDetail() {
   );
   if (!product) return null;
 
+  const hasSizes = product.sizes && product.sizes.length > 0;
   const selectedSizeObj = product.sizes?.find(s => s.size === selectedSize);
-  const inStock = selectedSizeObj ? selectedSizeObj.stock > 0 : product.stock > 0;
+  const inStock = hasSizes ? (selectedSizeObj ? selectedSizeObj.stock > 0 : false) : product.stock > 0;
+  const displayStock = hasSizes && selectedSizeObj ? selectedSizeObj.stock : product.stock;
 
   return (
     <div className="product-detail-page container">
@@ -112,7 +116,7 @@ export default function ProductDetail() {
           
           <div className="detail-stock">
             <span className={`status-dot ${inStock ? 'in-stock' : 'out-stock'}`} />
-            {inStock ? `${product.stock} items available` : 'Currently out of stock'}
+            {inStock ? `${displayStock} items available` : 'Currently out of stock'}
           </div>
 
           <div className="detail-section">

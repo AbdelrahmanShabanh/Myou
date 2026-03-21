@@ -1,301 +1,472 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext.jsx';
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useCart } from "../context/CartContext.jsx";
 
-const SHIPPING_FEES = {
-  'Cairo': 50,
-  'Alexandria': 60,
-  'Other': 70
+const WHATSAPP_NUMBER = "201008872621";
+
+const GOVERNORATES = [
+  "Cairo", "Giza", "Alexandria", "Dakahlia", "Red Sea", "Beheira",
+  "Fayoum", "Gharbia", "Ismailia", "Menofia", "Minya", "Qalyubia",
+  "New Valley", "North Sinai", "Port Said", "Damietta", "Sharqia",
+  "South Sinai", "Suez", "Luxor", "Matrouh", "Qena", "Sohag", "Aswan", "Assiut", "Beni Suef",
+];
+
+const GOV_FEES = {
+  "Cairo": 100, "Giza": 100,
+  "Alexandria": 105,
+  "Dakahlia": 100, "Beheira": 100, "Gharbia": 100, "Menofia": 100, 
+  "Qalyubia": 100, "Damietta": 110, "Sharqia": 100, "Ismailia": 110, "Suez": 100,
+  "Port Said": 60,
+  "Fayoum": 110, "Beni Suef": 110, "Minya": 110, "Assiut": 110, 
+  "Sohag": 110, "Qena": 110, "Luxor": 110, "Aswan": 110, 
+  "Red Sea": 110, "New Valley": 110, "North Sinai": 110, 
+  "South Sinai": 110, "Matrouh": 110,
 };
 
 export default function Checkout() {
-  const { items, cartTotal } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { items, cartTotal, clearCart } = useCart();
   
-  const [formData, setFormData] = useState({
-    customerName: '',
-    phone: '',
-    address: '',
-    city: 'Cairo', // default
-    notes: ''
-  });
-  
-  const [paymentMethod, setPaymentMethod] = useState('cash_on_delivery');
-  const [instapayScreenshot, setInstapayScreenshot] = useState('');
-  const [uploading, setUploading] = useState(false);
-  
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const searchParams = new URLSearchParams(location.search);
+  const orderId = searchParams.get("orderId");
 
-  const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '201000000000';
-  const INSTAPAY_NUMBER = import.meta.env.VITE_INSTAPAY_NUMBER || '201000000000';
+  const [form, setForm] = useState({
+    fullName: "",
+    phone: "",
+    governorate: "",
+    address: "",
+  });
+
+  const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [errors, setErrors] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+  const [showReturnPolicy, setShowReturnPolicy] = useState(false);
+  const [hasClickedInstapay, setHasClickedInstapay] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Protect route
   useEffect(() => {
-    if (items.length === 0) navigate('/cart', { replace: true });
-  }, [items, navigate]);
+    if (items.length === 0 && !submitted) navigate('/cart', { replace: true });
+  }, [items, navigate, submitted]);
 
-  if (items.length === 0) return null;
+  if (items.length === 0 && !submitted) return null;
 
-  const shippingFee = SHIPPING_FEES[formData.city];
-  const grandTotal = cartTotal + shippingFee;
+  const total = cartTotal;
+  const deliveryFee = form.governorate ? (GOV_FEES[form.governorate] || 110) : 0;
+  const finalTotal = total + deliveryFee;
 
-  const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const validate = () => {
+    const errs = {};
+    if (!form.fullName.trim()) errs.fullName = "Full name is required";
+    if (!form.phone.trim() || form.phone.replace(/\D/g, "").length !== 11)
+      errs.phone = "Valid phone number is required (11 digits)";
+    if (!form.governorate) errs.governorate = "Governorate is required";
+    if (!form.address.trim()) errs.address = "Address is required";
+    return errs;
+  };
+
+  const buildWhatsAppMessage = () => {
+    const itemLines = items
+      .map((item) => `• ${item.product.name} | Size: ${item.size} | Qty: ${item.qty} | Price: ${item.product.price}`)
+      .join("\n");
+
+    const govLabel = form.governorate;
+    const payment = paymentMethod === "cash" ? "Cash on Delivery" : "Instapay (redirected)";
+
+    let msgStr = `*New Order from ${form.fullName}*\n\n`;
+    
+    return (
+      msgStr +
+      `*Contact:*\n📞 ${form.phone}\n\n` +
+      `*Address:*\n📍 ${govLabel}\n🏠 ${form.address}\n\n` +
+      `📦 *Order Items*\n${itemLines}\n\n` +
+      `💰 *Subtotal: LE ${total.toFixed(2)}*\n` +
+      `🚚 *Delivery Fee: LE ${deliveryFee.toFixed(2)}*\n` +
+      `💰 *Total: LE ${finalTotal.toFixed(2)}*\n` +
+      `💳 *Payment Method:* ${payment}`
+    );
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    if (paymentMethod === 'instapay' && !instapayScreenshot) {
-      setError('Please upload your InstaPay transfer screenshot.');
-      setLoading(false);
+    const errs = validate();
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
       return;
     }
+    setErrors({});
 
+    const message = buildWhatsAppMessage();
+    const encoded = encodeURIComponent(message);
+    const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`;
+    
+    window.open(waUrl, "_blank");
+
+    // Save order to backend API
     try {
-      const orderData = {
-        ...formData,
-        paymentMethod,
-        instapayScreenshot,
-        items: items.map(i => ({
-          productId: i.product._id,
-          name: i.product.name,
-          size: i.size,
-          qty: i.qty,
-          price: i.product.price,
-          image: i.product.images?.[0]
-        })),
-        total: grandTotal
-      };
+      const orderItems = items.map((item) => ({
+        productId: item.product._id,
+        name: item.product.name,
+        size: item.size,
+        qty: item.qty,
+        price: item.product.price,
+        image: item.product.images?.[0] || "",
+      }));
 
-      const res = await fetch('/api/orders', {
+      await fetch("/api/orders", {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          customerName: form.fullName,
+          phone: form.phone,
+          city: form.governorate,
+          address: form.address,
+          items: orderItems,
+          total: finalTotal,
+          paymentMethod,
+        })
       });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to place order');
-
-      // Build WhatsApp message
-      let msg = `*New Order: ${data._id.substring(0,8)}*\n`;
-      msg += `Name: ${formData.customerName}\n`;
-      msg += `Phone: ${formData.phone}\n`;
-      msg += `Address: ${formData.address}, ${formData.city}\n`;
-      msg += `Total: ${grandTotal} EGP\n`;
-      msg += `Payment: ${paymentMethod === 'instapay' ? 'InstaPay' : 'COD'}\n`;
-      if (formData.notes) msg += `Notes: ${formData.notes}\n`;
-      msg += `\n*Items:*\n`;
-      items.forEach(i => {
-        msg += `- ${i.qty}x ${i.product.name} (Size: ${i.size})\n`;
-      });
-
-      const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
-      window.open(waUrl, '_blank');
-
-      // Navigate to success page with order ID
-      navigate(`/order-success?orderId=${data._id}`, { replace: true });
     } catch (err) {
-      setError(err.message);
-      setLoading(false);
+      console.error("Failed to save order to API:", err);
     }
+
+    setSubmitted(true);
+    clearCart();
+
+    setTimeout(() => {
+      navigate("/");
+    }, 4000);
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setUploading(true);
-    
-    // We can use the same /api/upload endpoint even if not admin, assuming we allow public uploads for checkout or create a specific endpoint
-    // In our case, /api/upload requires admin token usually. Wait! 
-    // Let's assume /api/upload doesn't strictly verify admin if we pass a public flag, or we just upload it as dataURL for now and let the backend save it.
-    // The previous implementation used DataURLs directly or /api/upload. Let's send a post to a generic upload or use data structure.
-    // Actually, we can read it as DataURL and store it directly in order database if it's small, or just use /api/upload without admin token logic.
-    // Let's use FileReader and attach the dataURL directly to instapayScreenshot state. The backend schema `instapayScreenshot: { type: String }` can hold a Data URL.
-    
-    const reader = new FileReader();
-    reader.onload = () => {
-      setInstapayScreenshot(reader.result);
-      setUploading(false);
-    };
-    reader.onerror = () => {
-      setError('Failed to read file');
-      setUploading(false);
-    };
-    reader.readAsDataURL(file);
+  const handleChange = (field) => (e) => {
+    setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
   };
+
+  if (submitted) {
+    return (
+      <div className="checkout-success" style={{textAlign:'center', padding:'6rem 1rem'}}>
+        <div className="checkout-success-card">
+          <div className="checkout-success-icon" style={{fontSize:'3rem', color:'var(--success)', marginBottom:'1rem'}}>
+            ✓
+          </div>
+          <h2 style={{marginBottom:'0.5rem'}}>Order Placed!</h2>
+          <p style={{color:'var(--text-muted)'}}>Thank you! You have been redirected to WhatsApp to complete your order.</p>
+          <span style={{display:'block', marginTop:'1rem', fontSize:'0.9rem'}}>Redirecting you to the home page…</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="checkout-page container">
-      <h1 className="section-title mb-6">Checkout</h1>
-
       <div className="checkout-grid">
-        <form className="checkout-form" onSubmit={handleSubmit}>
-          
-          <div className="form-section">
-            <h2 className="form-section-title">Shipping Information</h2>
-            
-            <div className="form-group">
-              <label className="form-label">Full Name</label>
-              <input type="text" name="customerName" required className="form-input" value={formData.customerName} onChange={handleChange} placeholder="John Doe" />
-            </div>
 
-            <div className="form-group">
-              <label className="form-label">Phone Number</label>
-              <input type="tel" name="phone" required className="form-input" value={formData.phone} onChange={handleChange} placeholder="01X XXXX XXXX" />
-            </div>
+        {/* ── LEFT COLUMN: Form ── */}
+        <form className="checkout-form" onSubmit={handleSubmit} noValidate>
+          <h1 className="checkout-heading" style={{fontSize:'2rem', fontWeight:800, marginBottom:'2rem'}}>Checkout</h1>
 
-            <div className="form-row">
-              <div className="form-group" style={{flex: 2}}>
-                <label className="form-label">Detailed Address</label>
-                <input type="text" name="address" required className="form-input" value={formData.address} onChange={handleChange} placeholder="Street name, building, apt" />
+          {/* Shipping Address */}
+          <section className="form-section">
+            <h3 className="form-section-title" style={{fontSize:'1.25rem', fontWeight:800, marginBottom:'1.5rem', paddingBottom:'0.5rem', borderBottom:'1px solid var(--border)'}}>
+              Shipping Address
+            </h3>
+
+            <div className="checkout-form-row">
+              <div style={{flex:1}}>
+                <label style={{display:'block', marginBottom:'0.5rem', fontSize:'0.9rem', fontWeight:600}}>Full Name *</label>
+                <input
+                  type="text"
+                  placeholder="John Doe"
+                  className="form-input"
+                  style={{width:'100%', padding:'0.75rem', borderRadius:'var(--radius-sm)', border:errors.fullName?'1px solid var(--error)':'1px solid var(--border)', background:'var(--bg-elevated)', color:'var(--text)'}}
+                  value={form.fullName}
+                  onChange={handleChange("fullName")}
+                />
+                {errors.fullName && <span style={{color:'var(--error)', fontSize:'0.8rem', marginTop:'0.25rem', display:'block'}}>{errors.fullName}</span>}
               </div>
 
-              <div className="form-group" style={{flex: 1}}>
-                <label className="form-label">City</label>
-                <select name="city" className="form-input form-select" value={formData.city} onChange={handleChange}>
-                  <option value="Cairo">Cairo</option>
-                  <option value="Alexandria">Alexandria</option>
-                  <option value="Other">Other City</option>
-                </select>
+              <div style={{flex:1}}>
+                <label style={{display:'block', marginBottom:'0.5rem', fontSize:'0.9rem', fontWeight:600}}>Phone Number *</label>
+                <input
+                  type="tel"
+                  placeholder="01XXXXXXXXX"
+                  className="form-input"
+                  style={{width:'100%', padding:'0.75rem', borderRadius:'var(--radius-sm)', border:errors.phone?'1px solid var(--error)':'1px solid var(--border)', background:'var(--bg-elevated)', color:'var(--text)'}}
+                  value={form.phone}
+                  onChange={handleChange("phone")}
+                />
+                {errors.phone && <span style={{color:'var(--error)', fontSize:'0.8rem', marginTop:'0.25rem', display:'block'}}>{errors.phone}</span>}
               </div>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Order Notes (Optional)</label>
-              <textarea name="notes" className="form-input" value={formData.notes} onChange={handleChange} placeholder="Any special instructions for delivery" rows="3" />
+            <div style={{marginBottom:'1.5rem'}}>
+              <label style={{display:'block', marginBottom:'0.5rem', fontSize:'0.9rem', fontWeight:600}}>Governorate *</label>
+              <select 
+                className="form-input"
+                style={{width:'100%', padding:'0.75rem', borderRadius:'var(--radius-sm)', border:errors.governorate?'1px solid var(--error)':'1px solid var(--border)', background:'var(--bg-elevated)', color:'var(--text)'}}
+                value={form.governorate} 
+                onChange={handleChange("governorate")}
+              >
+                <option value="">Select governorate</option>
+                {GOVERNORATES.map((g, i) => (
+                  <option key={i} value={g}>{g}</option>
+                ))}
+              </select>
+              {errors.governorate && <span style={{color:'var(--error)', fontSize:'0.8rem', marginTop:'0.25rem', display:'block'}}>{errors.governorate}</span>}
             </div>
+
+            <div style={{marginBottom:'1rem'}}>
+              <label style={{display:'block', marginBottom:'0.5rem', fontSize:'0.9rem', fontWeight:600}}>Detailed Address *</label>
+              <textarea
+                rows={3}
+                className="form-input"
+                style={{width:'100%', padding:'0.75rem', borderRadius:'var(--radius-sm)', border:errors.address?'1px solid var(--error)':'1px solid var(--border)', background:'var(--bg-elevated)', color:'var(--text)', resize:'vertical'}}
+                placeholder="Street, building, apartment, landmark…"
+                value={form.address}
+                onChange={handleChange("address")}
+              />
+              {errors.address && <span style={{color:'var(--error)', fontSize:'0.8rem', marginTop:'0.25rem', display:'block'}}>{errors.address}</span>}
+            </div>
+          </section>
+
+          {/* Payment Method */}
+          <section className="form-section" style={{marginBottom:'2.5rem'}}>
+            <h3 className="form-section-title" style={{fontSize:'1.25rem', fontWeight:800, marginBottom:'1.5rem', paddingBottom:'0.5rem', borderBottom:'1px solid var(--border)'}}>
+              Payment Method
+            </h3>
+
+            <div className="payment-options" style={{display:'flex', flexDirection:'column', gap:'1rem', marginBottom:'1.5rem'}}>
+              <label style={{display:'flex', alignItems:'center', gap:'0.75rem', padding:'1.25rem', background:'var(--bg-elevated)', borderRadius:'var(--radius-sm)', border:paymentMethod === 'cash' ? '2px solid var(--accent)' : '1px solid var(--border)', cursor:'pointer'}}>
+                <input
+                  type="radio"
+                  name="payment"
+                  value="cash"
+                  style={{accentColor:'var(--accent)', margin: 0, width:'18px', height:'18px'}}
+                  checked={paymentMethod === "cash"}
+                  onChange={() => setPaymentMethod("cash")}
+                />
+                <span style={{fontWeight:600}}>Cash on Delivery</span>
+              </label>
+
+              <label style={{display:'flex', alignItems:'center', gap:'0.75rem', padding:'1.25rem', background:'var(--bg-elevated)', borderRadius:'var(--radius-sm)', border:paymentMethod === 'instapay' ? '2px solid var(--accent)' : '1px solid var(--border)', cursor:'pointer'}}>
+                <input
+                  type="radio"
+                  name="payment"
+                  value="instapay"
+                  style={{accentColor:'var(--accent)', margin: 0, width:'18px', height:'18px'}}
+                  checked={paymentMethod === "instapay"}
+                  onChange={() => {
+                    setPaymentMethod("instapay");
+                    setHasClickedInstapay(false);
+                  }}
+                />
+                <span style={{fontWeight:600}}>InstaPay</span>
+              </label>
+            </div>
+
+            {/* Instapay instructions */}
+            {paymentMethod === "instapay" && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding:'1.25rem', background:'rgba(124, 58, 237, 0.1)', borderRadius:'var(--radius-sm)', color:'var(--text)' }}>
+                <p style={{lineHeight:1.6, fontSize:'0.9rem', margin: 0}} dir="rtl">
+                  بعد النقر على زر InstaPay سيتم توجيهك إلى التطبيق، ثم يجب العودة للموقع لاستكمال الطلب وإرسال لقطة شاشة من عملية الدفع مع طلبك الى واتساب.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setHasClickedInstapay(true);
+                    window.open("https://ipn.eg/S/agad21/instapay/0lAkAO", "_blank");
+                  }}
+                  style={{
+                    backgroundColor: "#7c3aed",
+                    color: "#fff",
+                    padding: "0.8rem 1.5rem",
+                    borderRadius: "8px",
+                    border: "none",
+                    fontWeight: "bold",
+                    fontSize: "1rem",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                    alignSelf:'flex-start'
+                  }}
+                >
+                  Pay with InstaPay
+                </button>
+              </div>
+            )}
+          </section>
+
+          <div style={{background:'rgba(255,255,255,0.05)', padding:'1rem', borderRadius:'8px', marginBottom:'1.5rem', fontSize:'0.9rem', lineHeight:1.5}} dir="rtl">
+            <strong style={{display:'block', marginBottom:'0.5rem', color:'var(--accent)'}}>ملاحظة هامة:</strong>
+            بعد النقر على استكمال الدفع، سيتم توجيهك إلى واتساب. يجب النقر على إرسال لتأكيد الطلب.
           </div>
 
-          <div className="form-section">
-            <h2 className="form-section-title">Payment Method</h2>
-            <div className="payment-box mb-4" style={{borderColor: paymentMethod === 'cash_on_delivery' ? 'var(--accent)' : 'var(--border)'}}>
-              <div className="payment-radio custom-radio">
-                <input type="radio" name="paymentMethod" value="cash_on_delivery" id="cod" checked={paymentMethod === 'cash_on_delivery'} onChange={(e) => setPaymentMethod(e.target.value)} />
-                <label htmlFor="cod">Cash on Delivery (COD)</label>
-              </div>
-              <p className="payment-desc">Pay with cash upon delivery. Easy and secure.</p>
-            </div>
-            
-            <div className="payment-box" style={{borderColor: paymentMethod === 'instapay' ? 'var(--accent)' : 'var(--border)'}}>
-              <div className="payment-radio custom-radio">
-                <input type="radio" name="paymentMethod" value="instapay" id="instapay" checked={paymentMethod === 'instapay'} onChange={(e) => setPaymentMethod(e.target.value)} />
-                <label htmlFor="instapay">InstaPay</label>
-              </div>
-              <p className="payment-desc">Transfer to <strong>{INSTAPAY_NUMBER}</strong> and upload the screenshot.</p>
-              
-              {paymentMethod === 'instapay' && (
-                <div className="instapay-upload-area">
-                  <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} className="file-input" />
-                  {uploading && <span className="upload-loading">Processing...</span>}
-                  {instapayScreenshot && (
-                    <div className="upload-preview">
-                      <img src={instapayScreenshot} alt="Screenshot" />
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {error && <div className="alert alert-error mb-4">{error}</div>}
-
-          <button type="submit" className="btn btn-primary btn-lg full-width submit-btn" disabled={loading}>
-            {loading ? 'Processing...' : 'Place Order'}
+          <button 
+            type="submit" 
+            className="btn btn-primary btn-lg"
+            disabled={paymentMethod === "instapay" && !hasClickedInstapay}
+            style={{ 
+              opacity: (paymentMethod === "instapay" && !hasClickedInstapay) ? 0.5 : 1, 
+              cursor: (paymentMethod === "instapay" && !hasClickedInstapay) ? "not-allowed" : "pointer",
+              transition: "all 0.3s ease",
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem'
+            }}
+          >
+            Continue to Payment
           </button>
         </form>
 
-        <div className="checkout-sidebar">
-          <div className="order-summary-box">
-            <h3 className="summary-title">Order Summary</h3>
-            
-            <div className="summary-items">
-              {items.map(item => (
-                <div key={`${item.product._id}-${item.size}`} className="sum-item">
-                  <div className="sum-img-wrap">
-                    <img src={item.product.images?.[0]} alt={item.product.name} />
-                    <span className="sum-qty">{item.qty}</span>
-                  </div>
-                  <div className="sum-info">
-                    <p className="sum-name">{item.product.name}</p>
-                    <p className="sum-size">Size: {item.size}</p>
-                  </div>
-                  <div className="sum-price">{item.product.price * item.qty} EGP</div>
-                </div>
-              ))}
-            </div>
+        {/* ── RIGHT COLUMN: Order Summary ── */}
+        <aside className="checkout-summary" style={{background:'var(--bg-elevated)', padding:'2rem', border:'1px solid var(--border)', borderRadius:'var(--radius)'}}>
+          <h3 style={{fontSize:'1.25rem', fontWeight:800, marginBottom:'1.5rem'}}>Your Cart</h3>
 
-            <div className="summary-totals">
-              <div className="tot-row">
-                <span>Subtotal</span>
-                <span>{cartTotal} EGP</span>
+          <div style={{display:'flex', flexDirection:'column', gap:'1.25rem', marginBottom:'2rem'}}>
+            {items.map((item) => (
+              <div key={`${item.product._id}-${item.size}`} style={{display:'flex', gap:'1rem'}}>
+                <div style={{position:'relative', width:'70px', height:'85px', borderRadius:'6px', overflow:'hidden', flexShrink:0}}>
+                  <img src={item.product.images?.[0]} alt={item.product.name} style={{width:'100%', height:'100%', objectFit:'cover'}} loading="lazy" />
+                  <span style={{position:'absolute', top:'-5px', right:'-5px', background:'var(--accent)', color:'#fff', fontSize:'11px', width:'30px', height:'30px', display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'50%', fontWeight:'bold'}}>{item.qty}</span>
+                </div>
+                <div style={{flex:1}}>
+                  <p style={{fontWeight:700, fontSize:'0.95rem', margin:'0 0 0.25rem 0'}}>{item.product.name}</p>
+                  <p style={{fontSize:'0.85rem', color:'var(--text-muted)', margin:0}}>Size: {item.size}</p>
+                </div>
+                <span style={{fontWeight:700, fontSize:'0.95rem'}}>
+                  LE {(item.product.price * item.qty).toFixed(2)}
+                </span>
               </div>
-              <div className="tot-row">
-                <span>Shipping ({formData.city})</span>
-                <span>{shippingFee} EGP</span>
-              </div>
-              <div className="tot-row grand-tot">
-                <span>Grand Total</span>
-                <span className="accent-text">{grandTotal} EGP</span>
-              </div>
+            ))}
+          </div>
+
+          <div style={{height:'1px', background:'var(--border)', margin:'1.5rem 0'}} />
+
+          <div style={{display:'flex', justifyContent:'space-between', marginBottom:'1rem', fontSize:'0.95rem'}}>
+            <span style={{color:'var(--text-muted)'}}>Subtotal</span>
+            <span style={{fontWeight:600}}>LE {total.toFixed(2)}</span>
+          </div>
+          <div style={{display:'flex', justifyContent:'space-between', marginBottom:'1.5rem', fontSize:'0.95rem'}}>
+            <span style={{color:'var(--text-muted)'}}>Shipping</span>
+            {deliveryFee === 0 && !form.governorate ? (
+              <span style={{ color: "#999", fontSize:'0.85rem' }}>Select Gov</span>
+            ) : deliveryFee === 0 ? (
+              <span style={{color:'var(--success)', fontWeight:'bold'}}>Free</span>
+            ) : (
+              <span style={{fontWeight:600}}>LE {deliveryFee.toFixed(2)}</span>
+            )}
+          </div>
+
+          <div style={{height:'1px', background:'var(--border)', margin:'1.5rem 0'}} />
+
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:'1.2rem', fontWeight:800, marginBottom:'2rem'}}>
+            <span>Total</span>
+            <span style={{color:'var(--accent)'}}>LE {finalTotal.toFixed(2)}</span>
+          </div>
+
+        </aside>
+      </div>
+
+      {showReturnPolicy && (
+        <div style={{
+          position: "fixed",
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(0,0,0,0.7)",
+          zIndex: 9999,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "1rem"
+        }}>
+          <div style={{
+            background: "var(--bg-elevated)",
+            border: "1px solid var(--border)",
+            borderRadius: "16px",
+            padding: "2rem",
+            maxWidth: "500px",
+            width: "100%",
+            position: "relative",
+            direction: "rtl",
+            textAlign: "right",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
+          }}>
+            <button 
+              type="button" 
+              onClick={() => setShowReturnPolicy(false)}
+              style={{
+                position: "absolute",
+                top: "1rem",
+                left: "1rem",
+                background: "transparent",
+                border: "none",
+                color: "var(--text-muted)",
+                fontSize: "1.25rem",
+                cursor: "pointer"
+              }}
+            >
+              ✕
+            </button>
+            <h3 style={{ color: "var(--accent)", marginTop: 0, marginBottom: "1rem", fontSize: "1.2rem" }}>سياسة الاسترجاع والاستبدال</h3>
+            <div style={{ fontSize: "0.9rem", lineHeight: "1.6", color: "var(--text)" }}>
+              <p style={{ marginBottom: "0.75rem" }}><strong>عميلنا العزيز،</strong> حرصاً منا على سلامتك العامة وطبقاً للاشتراطات الصحية المتبعة عالمياً وفي قانون حماية المستهلك المصري:</p>
+              
+              <p style={{ marginBottom: "0.75rem" }}>
+                <strong style={{ color: "#ff4d4f" }}>المنتجات الشخصية:</strong> نعتذر عن استبدال أو استرجاع أي من قطع الملابس الداخلية (البوكسرات، الفانلات، الملابس الداخلية الحريمي) بمجرد استلامها وفتح الغلاف الخاص بها، وذلك لضمان أعلى معايير النظافة والصحة العامة لجميع عملائنا.
+              </p>
+              
+              <p style={{ marginBottom: "0.75rem" }}>
+                <strong style={{ color: "var(--accent)" }}>المعاينة عند الاستلام:</strong> يرجى التأكد من المقاس والنوع والعدد فور وصول المندوب وقبل فتح الغلاف الداخلي للمنتج. في حالة وجود أي اختلاف أو رغبة في التراجع، يمكنكم رفض الاستلام مع دفع مصاريف الشحن فقط.
+              </p>
+              
+              <p style={{ marginBottom: "0.75rem" }}>
+                <strong style={{ color: "var(--accent)" }}>عيوب الصناعة:</strong> في حالة وجود عيب صناعة واضح في المنتج، يتم التواصل معنا خلال 24 ساعة من الاستلام، وسنقوم باستبدال المنتج مجاناً دون تحملكم أي تكاليف إضافية (بشرط عدم استخدام المنتج).
+              </p>
+              
+              <p style={{ margin: 0 }}>
+                <strong style={{ color: "var(--accent)" }}>المقاسات:</strong> يرجى مراجعة "جدول المقاسات" الموضح في صفحة كل منتج بعناية قبل الطلب، حيث أن اختيار المقاس الخاطئ لا يمنح الحق في الاسترجاع بعد فتح المنتج.
+              </p>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       <style>{`
-        .checkout-page { padding-top: 3rem; padding-bottom: 6rem; }
-        .mb-6 { margin-bottom: 2.5rem; }
-        .mb-4 { margin-bottom: 1.5rem; }
-        .full-width { width: 100%; }
-        
-        .checkout-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 4rem; align-items: start; }
-        
-        .form-section { margin-bottom: 3rem; }
-        .form-section-title { font-size: 1.25rem; font-weight: 800; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
-        .form-row { display: flex; gap: 1rem; }
-        
-        .payment-box { background: var(--bg-elevated); border: 2px solid var(--accent); border-radius: var(--radius-sm); padding: 1.25rem; }
-        .payment-radio { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; font-weight: 700; font-size: 1rem; }
-        .payment-radio input[type="radio"] { accent-color: var(--accent); width: 18px; height: 18px; cursor: pointer; flex-shrink: 0; }
-        .payment-desc { font-size: 0.85rem; color: var(--text-subtle); margin-left: 1.9rem; line-height: 1.4; }
-        
-        .instapay-upload-area { margin-top: 1rem; margin-left: 1.9rem; display: flex; flex-direction: column; gap: 0.5rem; }
-        .file-input { font-size: 0.85rem; max-width: 100%; word-break: break-all; }
-        .upload-loading { font-size: 12px; color: var(--accent); }
-        .upload-preview img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); }
-        
-        .submit-btn { font-size: 1.1rem; letter-spacing: 0.05em; margin-top: 1rem; }
-        
-        .order-summary-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; position: sticky; top: 100px; }
-        .summary-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
-        
-        .summary-items { display: flex; flex-direction: column; gap: 1rem; border-bottom: 1px solid var(--border-light); padding-bottom: 1.5rem; margin-bottom: 1.5rem; max-height: 40vh; overflow-y: auto; padding-right: 0.5rem; }
-        .sum-item { display: flex; align-items: center; gap: 1rem; }
-        
-        .sum-img-wrap { position: relative; width: 64px; height: 64px; background: #111; border-radius: 8px; flex-shrink: 0; }
-        .sum-img-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
-        .sum-qty { position: absolute; top: -8px; right: -8px; background: var(--accent); color: var(--primary); width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; }
-        
-        .sum-info { flex: 1; }
-        .sum-name { font-weight: 700; font-size: 0.9rem; line-height: 1.2; margin-bottom: 0.2rem; }
-        .sum-size { font-size: 0.75rem; color: var(--text-muted); }
-        .sum-price { font-weight: 800; font-size: 0.9rem; }
-        
-        .tot-row { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.9rem; color: var(--text-muted); }
-        .grand-tot { margin-top: 1rem; font-size: 1.2rem; font-weight: 800; color: var(--text); border-top: 1px solid var(--border-light); padding-top: 1rem; align-items: center; }
-        .accent-text { color: var(--accent); font-size: 1.35rem; }
-        
-        @media (max-width: 900px) {
-          .checkout-grid { grid-template-columns: 1fr; flex-direction: column-reverse; display: flex; gap: 3rem; }
-          .checkout-sidebar { position: static; width: 100%; }
-          .form-row { flex-direction: column; gap: 0; }
+        .checkout-grid {
+          display: grid;
+          grid-template-columns: 1.5fr 1fr;
+          gap: 4rem;
+          align-items: start;
         }
-        @media (max-width: 480px) {
-          .payment-desc { margin-left: 0; margin-top: 0.5rem; }
-          .instapay-upload-area { margin-left: 0; }
-          .payment-box { padding: 1rem; }
+        .checkout-form-row {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+        }
+        @media (max-width: 991px) {
+          .checkout-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+          }
+          .checkout-summary {
+            order: -1; /* Show cart summary above form on mobile */
+          }
+        }
+        @media (max-width: 576px) {
+          .checkout-form-row {
+            flex-direction: column;
+            gap: 0.5rem;
+          }
         }
       `}</style>
     </div>

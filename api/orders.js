@@ -1,47 +1,54 @@
-import { connectDB, Order } from './_lib/db.js';
+import { connectDB, Order } from "./_lib/db.js";
 
 export default async function handler(req, res) {
-  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method === "OPTIONS") return res.status(200).end();
 
   await connectDB();
   const { id } = req.query;
 
-  if (req.method === 'GET') {
+  if (req.method === "GET") {
     try {
       if (id) {
         const order = await Order.findById(id);
-        if (!order) return res.status(404).json({ error: 'Order not found' });
+        if (!order) return res.status(404).json({ error: "Order not found" });
         return res.status(200).json(order);
       }
-      return res.status(400).json({ error: 'Order ID required' });
+      return res.status(400).json({ error: "Order ID required" });
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
   }
 
-  if (req.method === 'POST') {
+  if (req.method === "POST") {
     try {
       const { customerName, phone, address, city, items, total } = req.body;
 
-      if (!customerName || !phone || !address || !city || !items?.length || !total) {
-        return res.status(400).json({ error: 'Missing required fields' });
+      if (
+        !customerName ||
+        !phone ||
+        !address ||
+        !city ||
+        !items?.length ||
+        !total
+      ) {
+        return res.status(400).json({ error: "Missing required fields" });
       }
 
       const order = new Order(req.body);
       await order.save();
-      
-      const { Product } = await import('./_lib/db.js');
+
+      const { Product } = await import("./_lib/db.js");
       // Decrement stock
       for (const item of items) {
         if (item.productId && item.size) {
           await Product.updateOne(
             { _id: item.productId, "sizes.size": item.size },
-            { 
-              $inc: { 
-                "stock": -item.qty,
-                "sizes.$.stock": -item.qty
-              } 
-            }
+            {
+              $inc: {
+                stock: -item.qty,
+                "sizes.$.stock": -item.qty,
+              },
+            },
           );
         }
       }
@@ -52,5 +59,5 @@ export default async function handler(req, res) {
     }
   }
 
-  return res.status(405).json({ error: 'Method not allowed' });
+  return res.status(405).json({ error: "Method not allowed" });
 }
