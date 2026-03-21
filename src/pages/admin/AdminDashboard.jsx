@@ -41,7 +41,9 @@ export default function AdminDashboard() {
           orders: Array.isArray(ordersData) ? ordersData.length : 0,
         });
         if (revenueData) setRevenue(revenueData);
-        setRecentOrders(Array.isArray(ordersData) ? ordersData.slice(0, 5) : []);
+        setRecentOrders(
+          Array.isArray(ordersData) ? ordersData.slice(0, 5) : [],
+        );
         setLoading(false);
       })
       .catch((err) => {
