@@ -1,17 +1,17 @@
-import { useSearchParams } from 'react-router-dom';
-const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+import { useSearchParams } from "react-router-dom";
+const SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 
 export default function FilterSidebar({ filters, onChange, categories }) {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const handleCategory = (cat) => {
-    onChange({ ...filters, category: filters.category === cat ? '' : cat });
+    onChange({ ...filters, category: filters.category === cat ? "" : cat });
   };
 
   const handleSize = (size) => {
     const sizes = filters.sizes || [];
     const newSizes = sizes.includes(size)
-      ? sizes.filter(s => s !== size)
+      ? sizes.filter((s) => s !== size)
       : [...sizes, size];
     onChange({ ...filters, sizes: newSizes });
   };
@@ -20,42 +20,50 @@ export default function FilterSidebar({ filters, onChange, categories }) {
     onChange({ ...filters, maxPrice: Number(e.target.value) });
   };
 
-  const clearAll = () => onChange({ category: '', sizes: [], maxPrice: 600 });
+  const clearAll = () => onChange({ category: "", sizes: [], maxPrice: 600 });
 
-  const hasFilters = filters.category || filters.sizes?.length > 0 || filters.maxPrice < 600;
+  const hasFilters =
+    filters.category || filters.sizes?.length > 0 || filters.maxPrice < 600;
 
-  const mainCategories = categories.filter(c => !c.parent);
-  const getSubcategories = (parentId) => categories.filter(c => c.parent && (c.parent._id === parentId || c.parent === parentId));
+  const mainCategories = categories.filter((c) => !c.parent);
+  const getSubcategories = (parentId) =>
+    categories.filter(
+      (c) => c.parent && (c.parent._id === parentId || c.parent === parentId),
+    );
 
   return (
     <aside className="filter-sidebar">
       <div className="filter-header">
         <h3 className="filter-title">Filters</h3>
         {hasFilters && (
-          <button className="filter-clear-btn" onClick={clearAll}>Clear all</button>
+          <button className="filter-clear-btn" onClick={clearAll}>
+            Clear all
+          </button>
         )}
       </div>
 
       <div className="filter-section">
         <p className="filter-section-label">Category</p>
         <div className="category-pills">
-          {mainCategories.map(cat => {
+          {mainCategories.map((cat) => {
             const subCats = getSubcategories(cat._id);
-            const isExpanded = filters.category === cat.slug || subCats.some(sub => sub.slug === filters.category);
+            const isExpanded =
+              filters.category === cat.slug ||
+              subCats.some((sub) => sub.slug === filters.category);
             return (
               <div key={cat._id} className="category-group">
                 <button
-                  className={`cat-pill ${filters.category === cat.slug ? 'active' : ''}`}
+                  className={`cat-pill ${filters.category === cat.slug ? "active" : ""}`}
                   onClick={() => handleCategory(cat.slug)}
                 >
                   {cat.name}
                 </button>
                 {isExpanded && subCats.length > 0 && (
                   <div className="subcategories">
-                    {subCats.map(sub => (
+                    {subCats.map((sub) => (
                       <button
                         key={sub._id}
-                        className={`cat-pill sub-pill ${filters.category === sub.slug ? 'active' : ''}`}
+                        className={`cat-pill sub-pill ${filters.category === sub.slug ? "active" : ""}`}
                         onClick={() => handleCategory(sub.slug)}
                       >
                         ↳ {sub.name}
@@ -72,10 +80,10 @@ export default function FilterSidebar({ filters, onChange, categories }) {
       <div className="filter-section">
         <p className="filter-section-label">Size</p>
         <div className="size-grid">
-          {SIZES.map(size => (
+          {SIZES.map((size) => (
             <button
               key={size}
-              className={`size-btn ${filters.sizes?.includes(size) ? 'active' : ''}`}
+              className={`size-btn ${filters.sizes?.includes(size) ? "active" : ""}`}
               onClick={() => handleSize(size)}
             >
               {size}
@@ -85,7 +93,10 @@ export default function FilterSidebar({ filters, onChange, categories }) {
       </div>
 
       <div className="filter-section">
-        <p className="filter-section-label">Max Price: <span className="price-val">{filters.maxPrice || 600} EGP</span></p>
+        <p className="filter-section-label">
+          Max Price:{" "}
+          <span className="price-val">{filters.maxPrice || 600} EGP</span>
+        </p>
         <input
           type="range"
           min="50"

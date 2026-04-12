@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -6,43 +6,60 @@ export default function AdminProducts() {
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  
+
   const [formData, setFormData] = useState(getInitialForm());
   const [editId, setEditId] = useState(null);
   const [categories, setCategories] = useState([]);
 
   function getInitialForm() {
-    return { name: '', description: '', price: '', oldPrice: '', category: '', sizes: [], stock: 0, material: '', images: [], featured: false, isOffer: false };
+    return {
+      name: "",
+      description: "",
+      price: "",
+      oldPrice: "",
+      category: "",
+      sizes: [],
+      stock: 0,
+      material: "",
+      images: [],
+      featured: false,
+      isOffer: false,
+    };
   }
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('/api/products');
+      const res = await fetch("/api/products");
       const data = await res.json();
       setProducts(data);
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+    }
     setLoading(false);
   };
 
-  useEffect(() => { 
+  useEffect(() => {
     fetchProducts();
-    fetch('/api/categories?all=true').then(r => r.json()).then(data => {
-      if (Array.isArray(data)) setCategories(data);
-    }).catch(() => {});
+    fetch("/api/categories?all=true")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) setCategories(data);
+      })
+      .catch(() => {});
   }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    if (type === 'checkbox') {
-      setFormData(prev => ({ ...prev, [name]: checked }));
+    if (type === "checkbox") {
+      setFormData((prev) => ({ ...prev, [name]: checked }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   const handleSizeChange = (sizeObj) => {
-    setFormData(prev => {
-      const idx = prev.sizes.findIndex(s => s.size === sizeObj.size);
+    setFormData((prev) => {
+      const idx = prev.sizes.findIndex((s) => s.size === sizeObj.size);
       let sizes = [...prev.sizes];
       if (idx >= 0) {
         if (sizeObj.stock === undefined) {
@@ -61,35 +78,43 @@ export default function AdminProducts() {
   const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
-    
+
     setUploading(true);
     const newImages = [...formData.images];
-    const token = localStorage.getItem('myou_admin_token');
+    const token = localStorage.getItem("myou_admin_token");
 
     for (const file of files) {
       if (newImages.length >= 5) break; // max 5
-      
+
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      await new Promise(res => reader.onload = res);
-      
+      await new Promise((res) => (reader.onload = res));
+
       try {
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-          body: JSON.stringify({ image: reader.result })
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ image: reader.result }),
         });
         const data = await res.json();
         if (data.url) newImages.push(data.url);
-      } catch (err) { console.error('Upload failed', err); }
+      } catch (err) {
+        console.error("Upload failed", err);
+      }
     }
-    
-    setFormData(prev => ({ ...prev, images: newImages }));
+
+    setFormData((prev) => ({ ...prev, images: newImages }));
     setUploading(false);
   };
 
   const removeImage = (index) => {
-    setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
   };
 
   const openEdit = (product) => {
@@ -109,58 +134,76 @@ export default function AdminProducts() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this product?')) return;
-    const token = localStorage.getItem('myou_admin_token');
+    if (!window.confirm("Are you sure you want to delete this product?"))
+      return;
+    const token = localStorage.getItem("myou_admin_token");
     try {
       await fetch(`/api/products?id=${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
       });
       fetchProducts();
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-    const token = localStorage.getItem('myou_admin_token');
-    
-    const url = editId ? `/api/products?id=${editId}` : '/api/products';
-    const method = editId ? 'PUT' : 'POST';
+    const token = localStorage.getItem("myou_admin_token");
+
+    const url = editId ? `/api/products?id=${editId}` : "/api/products";
+    const method = editId ? "PUT" : "POST";
 
     try {
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           ...formData,
           price: Number(formData.price),
           oldPrice: formData.oldPrice ? Number(formData.oldPrice) : undefined,
-          stock: formData.sizes.reduce((acc, curr) => acc + (curr.stock || 0), 0)
-        })
+          stock: formData.sizes.reduce(
+            (acc, curr) => acc + (curr.stock || 0),
+            0,
+          ),
+        }),
       });
       if (res.ok) {
         setShowModal(false);
         fetchProducts();
       }
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+    }
     setSaving(false);
   };
 
-  if (loading) return <div className="page-loader"><div className="spinner" /></div>;
+  if (loading)
+    return (
+      <div className="page-loader">
+        <div className="spinner" />
+      </div>
+    );
 
   return (
     <div className="admin-page container">
       <div className="admin-header">
         <h1 className="section-title">Products</h1>
-        <button className="btn btn-primary" onClick={openNew}>+ Add Product</button>
+        <button className="btn btn-primary" onClick={openNew}>
+          + Add Product
+        </button>
       </div>
 
       <div className="table-responsive">
         <table className="admin-table">
           <thead>
             <tr>
-              <th style={{width: '60px'}}>Img</th>
+              <th style={{ width: "60px" }}>Img</th>
               <th>Name</th>
               <th>Category</th>
               <th>Price</th>
@@ -169,26 +212,55 @@ export default function AdminProducts() {
             </tr>
           </thead>
           <tbody>
-            {products.map(p => (
+            {products.map((p) => (
               <tr key={p._id}>
                 <td>
-                  <img src={p.images?.[0] || 'placeholder'} alt="" style={{width:'40px', height:'40px', objectFit:'cover', borderRadius:'4px', background:'#111'}} />
+                  <img
+                    src={p.images?.[0] || "placeholder"}
+                    alt=""
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      objectFit: "cover",
+                      borderRadius: "4px",
+                      background: "#111",
+                    }}
+                  />
                 </td>
                 <td>
                   <strong>{p.name}</strong>
-                  {p.featured && <span className="badge badge-accent ms-2" style={{marginLeft:'8px'}}>Featured</span>}
+                  {p.featured && (
+                    <span
+                      className="badge badge-accent ms-2"
+                      style={{ marginLeft: "8px" }}
+                    >
+                      Featured
+                    </span>
+                  )}
                 </td>
-                <td style={{textTransform:'capitalize'}}>{p.category}</td>
+                <td style={{ textTransform: "capitalize" }}>{p.category}</td>
                 <td>{p.price} EGP</td>
                 <td>
-                  <span className={`badge ${p.stock > 0 ? 'badge-success' : 'badge-error'}`}>
-                    {p.stock > 0 ? `${p.stock} in stock` : 'Out of stock'}
+                  <span
+                    className={`badge ${p.stock > 0 ? "badge-success" : "badge-error"}`}
+                  >
+                    {p.stock > 0 ? `${p.stock} in stock` : "Out of stock"}
                   </span>
                 </td>
                 <td>
-                  <div style={{display:'flex', gap:'0.5rem'}}>
-                    <button className="icon-btn edt" onClick={() => openEdit(p)}>✎ Edit</button>
-                    <button className="icon-btn del" onClick={() => handleDelete(p._id)}>🗑 Del</button>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <button
+                      className="icon-btn edt"
+                      onClick={() => openEdit(p)}
+                    >
+                      ✎ Edit
+                    </button>
+                    <button
+                      className="icon-btn del"
+                      onClick={() => handleDelete(p._id)}
+                    >
+                      🗑 Del
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -200,61 +272,121 @@ export default function AdminProducts() {
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h2 className="section-title mb-4" style={{fontSize:'1.5rem'}}>{editId ? 'Edit Product' : 'Add New Product'}</h2>
-            
+            <h2 className="section-title mb-4" style={{ fontSize: "1.5rem" }}>
+              {editId ? "Edit Product" : "Add New Product"}
+            </h2>
+
             <form onSubmit={handleSubmit} className="admin-form">
               <div className="form-group">
                 <label className="form-label">Name</label>
-                <input type="text" name="name" className="form-input" required value={formData.name} onChange={handleChange} />
+                <input
+                  type="text"
+                  name="name"
+                  className="form-input"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                />
               </div>
 
               <div className="form-row">
-                <div className="form-group" style={{flex:1}}>
+                <div className="form-group" style={{ flex: 1 }}>
                   <label className="form-label">Price (EGP)</label>
-                  <input type="number" name="price" className="form-input" required min="1" value={formData.price} onChange={handleChange} />
+                  <input
+                    type="number"
+                    name="price"
+                    className="form-input"
+                    required
+                    min="1"
+                    value={formData.price}
+                    onChange={handleChange}
+                  />
                 </div>
-                <div className="form-group" style={{flex:1}}>
+                <div className="form-group" style={{ flex: 1 }}>
                   <label className="form-label">Category</label>
-                  <select name="category" className="form-input form-select" required value={formData.category} onChange={handleChange}>
+                  <select
+                    name="category"
+                    className="form-input form-select"
+                    required
+                    value={formData.category}
+                    onChange={handleChange}
+                  >
                     <option value="">Select a category</option>
-                    {categories.filter(c => !c.parent).map(mainCat => (
-                      <optgroup key={mainCat._id} label={mainCat.name}>
-                        <option value={mainCat.slug}>{mainCat.name} (Main)</option>
-                        {categories.filter(sub => sub.parent && (sub.parent._id === mainCat._id || sub.parent === mainCat._id)).map(subCat => (
-                          <option key={subCat._id} value={subCat.slug}>↳ {subCat.name}</option>
-                        ))}
-                      </optgroup>
-                    ))}
+                    {categories
+                      .filter((c) => !c.parent)
+                      .map((mainCat) => (
+                        <optgroup key={mainCat._id} label={mainCat.name}>
+                          <option value={mainCat.slug}>
+                            {mainCat.name} (Main)
+                          </option>
+                          {categories
+                            .filter(
+                              (sub) =>
+                                sub.parent &&
+                                (sub.parent._id === mainCat._id ||
+                                  sub.parent === mainCat._id),
+                            )
+                            .map((subCat) => (
+                              <option key={subCat._id} value={subCat.slug}>
+                                ↳ {subCat.name}
+                              </option>
+                            ))}
+                        </optgroup>
+                      ))}
                   </select>
                 </div>
               </div>
 
               <div className="form-group">
                 <label className="form-label">Sizes & Stock</label>
-                <div className="size-checkboxes" style={{flexDirection: 'column', gap: '8px'}}>
-                  {['OS','XS','S','M','L','XL','XXL'].map(sz => {
-                    const existingSize = formData.sizes.find(s => s.size === sz);
+                <div
+                  className="size-checkboxes"
+                  style={{ flexDirection: "column", gap: "8px" }}
+                >
+                  {["OS", "XS", "S", "M", "L", "XL", "XXL"].map((sz) => {
+                    const existingSize = formData.sizes.find(
+                      (s) => s.size === sz,
+                    );
                     const isSelected = !!existingSize;
                     return (
-                      <div key={sz} style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-                        <label className="size-cb" style={{width: '80px'}}>
-                          <input type="checkbox" checked={isSelected} onChange={(e) => {
-                            if (e.target.checked) {
-                              handleSizeChange({ size: sz, stock: 0 });
-                            } else {
-                              handleSizeChange({ size: sz });
-                            }
-                          }} />
+                      <div
+                        key={sz}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                        }}
+                      >
+                        <label className="size-cb" style={{ width: "80px" }}>
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                handleSizeChange({ size: sz, stock: 0 });
+                              } else {
+                                handleSizeChange({ size: sz });
+                              }
+                            }}
+                          />
                           <span>{sz}</span>
                         </label>
                         {isSelected && (
-                          <input 
-                            type="number" 
-                            className="form-input" 
-                            style={{width: '100px', padding: '0.25rem 0.5rem'}} 
-                            min="0" 
-                            value={existingSize.stock} 
-                            onChange={(e) => handleSizeChange({ size: sz, stock: Number(e.target.value) })}
+                          <input
+                            type="number"
+                            className="form-input"
+                            style={{
+                              width: "100px",
+                              padding: "0.25rem 0.5rem",
+                            }}
+                            min="0"
+                            value={existingSize.stock}
+                            onChange={(e) =>
+                              handleSizeChange({
+                                size: sz,
+                                stock: Number(e.target.value),
+                              })
+                            }
                             placeholder="Stock"
                           />
                         )}
@@ -265,32 +397,70 @@ export default function AdminProducts() {
               </div>
 
               <div className="form-row">
-                <div className="form-group" style={{flex: 1}}>
-                  <label className="form-label">Total Stock (Auto-calculated)</label>
-                  <input type="number" name="stock" className="form-input" disabled value={formData.sizes.reduce((acc, curr) => acc + (curr.stock || 0), 0)} />
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label className="form-label">
+                    Total Stock (Auto-calculated)
+                  </label>
+                  <input
+                    type="number"
+                    name="stock"
+                    className="form-input"
+                    disabled
+                    value={formData.sizes.reduce(
+                      (acc, curr) => acc + (curr.stock || 0),
+                      0,
+                    )}
+                  />
                 </div>
-                <div className="form-group" style={{flex: 1}}>
+                <div className="form-group" style={{ flex: 1 }}>
                   <label className="form-label">Material (Optional)</label>
-                  <input type="text" name="material" className="form-input" placeholder="e.g. 100% Cotton" value={formData.material} onChange={handleChange} />
+                  <input
+                    type="text"
+                    name="material"
+                    className="form-input"
+                    placeholder="e.g. 100% Cotton"
+                    value={formData.material}
+                    onChange={handleChange}
+                  />
                 </div>
               </div>
 
               <div className="form-group custom-checkbox">
                 <label>
-                  <input type="checkbox" name="featured" checked={formData.featured} onChange={handleChange} />
+                  <input
+                    type="checkbox"
+                    name="featured"
+                    checked={formData.featured}
+                    onChange={handleChange}
+                  />
                   <span>Feature on Homepage</span>
                 </label>
               </div>
               <div className="form-group custom-checkbox">
                 <label>
-                  <input type="checkbox" name="isOffer" checked={formData.isOffer} onChange={handleChange} />
+                  <input
+                    type="checkbox"
+                    name="isOffer"
+                    checked={formData.isOffer}
+                    onChange={handleChange}
+                  />
                   <span>Is this an Offer?</span>
                 </label>
               </div>
               {formData.isOffer && (
-                <div className="form-group" style={{marginTop: '1rem'}}>
-                  <label className="form-label">Old Price (EGP) - Optional</label>
-                  <input type="number" name="oldPrice" className="form-input" min="1" value={formData.oldPrice || ''} onChange={handleChange} placeholder="e.g. 599" />
+                <div className="form-group" style={{ marginTop: "1rem" }}>
+                  <label className="form-label">
+                    Old Price (EGP) - Optional
+                  </label>
+                  <input
+                    type="number"
+                    name="oldPrice"
+                    className="form-input"
+                    min="1"
+                    value={formData.oldPrice || ""}
+                    onChange={handleChange}
+                    placeholder="e.g. 599"
+                  />
                 </div>
               )}
 
@@ -299,14 +469,27 @@ export default function AdminProducts() {
                 <div className="img-upload-grid">
                   {formData.images.map((img, i) => (
                     <div key={i} className="img-preview">
-                      <img src={img} alt=""/>
-                      <button type="button" onClick={() => removeImage(i)}>✕</button>
+                      <img src={img} alt="" />
+                      <button type="button" onClick={() => removeImage(i)}>
+                        ✕
+                      </button>
                     </div>
                   ))}
                   {formData.images.length < 5 && (
                     <label className="img-upload-btn">
-                      {uploading ? <div className="spinner sm"></div> : <span>+ Upload</span>}
-                      <input type="file" multiple accept="image/*" onChange={handleImageUpload} disabled={uploading} hidden />
+                      {uploading ? (
+                        <div className="spinner sm"></div>
+                      ) : (
+                        <span>+ Upload</span>
+                      )}
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={uploading}
+                        hidden
+                      />
                     </label>
                   )}
                 </div>
@@ -314,12 +497,31 @@ export default function AdminProducts() {
 
               <div className="form-group">
                 <label className="form-label">Description</label>
-                <textarea name="description" className="form-input" rows="3" value={formData.description} onChange={handleChange} />
+                <textarea
+                  name="description"
+                  className="form-input"
+                  rows="3"
+                  value={formData.description}
+                  onChange={handleChange}
+                />
               </div>
 
               <div className="modal-actions mt-4">
-                <button type="button" className="btn btn-dark" onClick={() => setShowModal(false)} disabled={saving}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={saving || uploading}>{saving ? 'Saving...' : 'Save Product'}</button>
+                <button
+                  type="button"
+                  className="btn btn-dark"
+                  onClick={() => setShowModal(false)}
+                  disabled={saving}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={saving || uploading}
+                >
+                  {saving ? "Saving..." : "Save Product"}
+                </button>
               </div>
             </form>
           </div>

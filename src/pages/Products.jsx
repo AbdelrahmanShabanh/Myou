@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
-import ProductCard from '../components/ProductCard.jsx';
-import SkeletonCard from '../components/SkeletonCard.jsx';
-import FilterSidebar from '../components/FilterSidebar.jsx';
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams, Link } from "react-router-dom";
+import ProductCard from "../components/ProductCard.jsx";
+import SkeletonCard from "../components/SkeletonCard.jsx";
+import FilterSidebar from "../components/FilterSidebar.jsx";
 
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -13,16 +13,18 @@ export default function Products() {
 
   // Parse filters from URL
   const filters = {
-    category: searchParams.get('category') || '',
-    sizes: searchParams.get('sizes') ? searchParams.get('sizes').split(',') : [],
-    maxPrice: Number(searchParams.get('maxPrice')) || 600,
-    search: searchParams.get('search') || ''
+    category: searchParams.get("category") || "",
+    sizes: searchParams.get("sizes")
+      ? searchParams.get("sizes").split(",")
+      : [],
+    maxPrice: Number(searchParams.get("maxPrice")) || 600,
+    search: searchParams.get("search") || "",
   };
 
   useEffect(() => {
-    fetch('/api/categories')
-      .then(r => r.json())
-      .then(data => {
+    fetch("/api/categories")
+      .then((r) => r.json())
+      .then((data) => {
         if (Array.isArray(data)) setCategories(data);
       })
       .catch(() => {});
@@ -30,36 +32,44 @@ export default function Products() {
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
-    let url = '/api/products';
+    let url = "/api/products";
     const params = new URLSearchParams();
-    if (filters.category) params.append('category', filters.category);
-    if (filters.search) params.append('search', filters.search);
-    
+    if (filters.category) params.append("category", filters.category);
+    if (filters.search) params.append("search", filters.search);
+
     if (params.toString()) url += `?${params.toString()}`;
 
     try {
       const res = await fetch(url);
       let data = await res.json();
-      
-      if (!res.ok || data.error) throw new Error(data.error || 'Failed to fetch products');
-      
+
+      if (!res.ok || data.error)
+        throw new Error(data.error || "Failed to fetch products");
+
       // Client-side filtering for size and price (since our simple API doesn't support it)
       if (filters.sizes.length > 0) {
-        data = data.filter(p => p.sizes.some(s => filters.sizes.includes(s.size)));
+        data = data.filter((p) =>
+          p.sizes.some((s) => filters.sizes.includes(s.size)),
+        );
       }
       if (filters.maxPrice < 600) {
-        data = data.filter(p => p.price <= filters.maxPrice);
+        data = data.filter((p) => p.price <= filters.maxPrice);
       }
-      
+
       setProducts(data);
       setErrorObj(null);
     } catch (err) {
-      console.error('Failed to fetch products', err);
+      console.error("Failed to fetch products", err);
       setErrorObj(err.message);
     } finally {
       setLoading(false);
     }
-  }, [filters.category, filters.search, filters.sizes.join(','), filters.maxPrice]);
+  }, [
+    filters.category,
+    filters.search,
+    filters.sizes.join(","),
+    filters.maxPrice,
+  ]);
 
   useEffect(() => {
     fetchProducts();
@@ -68,43 +78,71 @@ export default function Products() {
 
   const handleFilterChange = (newFilters) => {
     const params = new URLSearchParams();
-    if (newFilters.category) params.set('category', newFilters.category);
-    if (newFilters.sizes?.length) params.set('sizes', newFilters.sizes.join(','));
-    if (newFilters.maxPrice < 600) params.set('maxPrice', newFilters.maxPrice);
-    if (newFilters.search) params.set('search', newFilters.search);
+    if (newFilters.category) params.set("category", newFilters.category);
+    if (newFilters.sizes?.length)
+      params.set("sizes", newFilters.sizes.join(","));
+    if (newFilters.maxPrice < 600) params.set("maxPrice", newFilters.maxPrice);
+    if (newFilters.search) params.set("search", newFilters.search);
     setSearchParams(params);
   };
 
-  const currentCat = categories.find(c => c.slug === filters.category);
-  const subCategories = currentCat && !currentCat.parent 
-    ? categories.filter(c => c.parent && (c.parent._id === currentCat._id || c.parent === currentCat._id)) 
-    : [];
+  const currentCat = categories.find((c) => c.slug === filters.category);
+  const subCategories =
+    currentCat && !currentCat.parent
+      ? categories.filter(
+          (c) =>
+            c.parent &&
+            (c.parent._id === currentCat._id || c.parent === currentCat._id),
+        )
+      : [];
 
   return (
     <div className="products-page container">
       <div className="page-header">
         <h1 className="section-title">Shop All</h1>
         <p className="page-subtitle">
-          Showing {loading ? '...' : (subCategories.length > 0 ? subCategories.length + ' Categories' : products.length + ' results')}
+          Showing{" "}
+          {loading
+            ? "..."
+            : subCategories.length > 0
+              ? subCategories.length + " Categories"
+              : products.length + " results"}
         </p>
       </div>
 
       <div className="products-layout">
-        <FilterSidebar filters={filters} onChange={handleFilterChange} categories={categories} />
-        
+        <FilterSidebar
+          filters={filters}
+          onChange={handleFilterChange}
+          categories={categories}
+        />
+
         <div className="products-main">
           {filters.search && (
             <div className="search-banner">
               Search results for: <strong>"{filters.search}"</strong>
-              <button onClick={() => handleFilterChange({...filters, search: ''})} className="clear-search-btn">✕</button>
+              <button
+                onClick={() => handleFilterChange({ ...filters, search: "" })}
+                className="clear-search-btn"
+              >
+                ✕
+              </button>
             </div>
           )}
 
           {subCategories.length > 0 && (
             <div className="subcategories-grid">
-              {subCategories.map(sub => (
-                <Link key={sub._id} to={`/products?category=${sub.slug}`} className="cat-card sub-card">
-                  <img src={sub.image || '/collections/caps.jpg'} alt={sub.name} className="cat-img"/>
+              {subCategories.map((sub) => (
+                <Link
+                  key={sub._id}
+                  to={`/products?category=${sub.slug}`}
+                  className="cat-card sub-card"
+                >
+                  <img
+                    src={sub.image || "/collections/caps.jpg"}
+                    alt={sub.name}
+                    className="cat-img"
+                  />
                   <div className="cat-overlay">
                     <h3 className="cat-title">{sub.name}</h3>
                   </div>
@@ -112,24 +150,38 @@ export default function Products() {
               ))}
             </div>
           )}
-          
+
           {subCategories.length === 0 && (
             <div className="product-grid">
               {loading ? (
-                Array(8).fill().map((_, i) => <SkeletonCard key={i} />)
+                Array(8)
+                  .fill()
+                  .map((_, i) => <SkeletonCard key={i} />)
               ) : errorObj ? (
-                <div className="empty-state" style={{gridColumn: '1/-1', color: 'var(--error)'}}>
+                <div
+                  className="empty-state"
+                  style={{ gridColumn: "1/-1", color: "var(--error)" }}
+                >
                   <h3>API Connection Error</h3>
                   <p>{errorObj}</p>
                 </div>
               ) : products.length > 0 ? (
-                products.map(p => <ProductCard key={p._id} product={p} />)
+                products.map((p) => <ProductCard key={p._id} product={p} />)
               ) : (
-                <div className="empty-state" style={{gridColumn: '1/-1'}}>
+                <div className="empty-state" style={{ gridColumn: "1/-1" }}>
                   <div className="empty-state-icon">😕</div>
                   <h3>No products found</h3>
                   <p>Try adjusting your filters or search terms.</p>
-                  <button className="btn btn-outline" onClick={() => handleFilterChange({category:'', sizes:[], maxPrice:600})}>
+                  <button
+                    className="btn btn-outline"
+                    onClick={() =>
+                      handleFilterChange({
+                        category: "",
+                        sizes: [],
+                        maxPrice: 600,
+                      })
+                    }
+                  >
                     Clear Filters
                   </button>
                 </div>

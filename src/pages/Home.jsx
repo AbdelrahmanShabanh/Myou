@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import DiscountScroller from '../components/DiscountScroller.jsx';
-import ProductCard from '../components/ProductCard.jsx';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import DiscountScroller from "../components/DiscountScroller.jsx";
+import ProductCard from "../components/ProductCard.jsx";
 
 export default function Home() {
   const [discounts, setDiscounts] = useState([]);
@@ -11,23 +11,24 @@ export default function Home() {
   const [offerProducts, setOfferProducts] = useState([]);
 
   useEffect(() => {
-    fetch('/api/discounts')
-      .then(r => r.json())
-      .then(data => Array.isArray(data) && setDiscounts(data))
+    fetch("/api/discounts")
+      .then((r) => r.json())
+      .then((data) => Array.isArray(data) && setDiscounts(data))
       .catch(() => {});
-      
-    fetch('/api/categories?parents=true')
-      .then(r => r.json())
-      .then(data => {
-        if(Array.isArray(data)) setCategories(data);
+
+    fetch("/api/categories?parents=true")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) setCategories(data);
         setLoadingCats(false);
       })
       .catch(() => setLoadingCats(false));
 
-    fetch('/api/products')
-      .then(r => r.json())
-      .then(data => {
-        if(Array.isArray(data)) setOfferProducts(data.filter(p => p.isOffer));
+    fetch("/api/products")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data))
+          setOfferProducts(data.filter((p) => p.isOffer));
         setLoadingOffers(false);
       })
       .catch(() => setLoadingOffers(false));
@@ -39,19 +40,31 @@ export default function Home() {
       <section className="hero">
         <div className="hero-content">
           <h1 className="hero-title">
-            <span className="hero-accent">Dress</span> Different.<br/>
+            <span className="hero-accent">Dress</span> Different.
+            <br />
             Stay <span className="hero-accent">M You.</span>
           </h1>
-          <p className="hero-subtitle">Premium Handpicked quality, unmatched aesthetic.</p>
+          <p className="hero-subtitle">
+            Premium Handpicked quality, unmatched aesthetic.
+          </p>
           <div className="hero-cta">
-            <Link to="/products" className="btn btn-primary btn-lg">Shop New Drops</Link>
+            <Link to="/products" className="btn btn-primary btn-lg">
+              Shop New Drops
+            </Link>
           </div>
         </div>
         <div className="hero-bg">
           <div className="hero-gradient" />
           <picture>
-            <source media="(min-width: 768px)" srcSet="/collections/_SHG8409.jpg" />
-            <img src="/collections/caps.jpg" alt="Streetwear Hero" className="hero-img" />
+            <source
+              media="(min-width: 768px)"
+              srcSet="/collections/_SHG8409.jpg"
+            />
+            <img
+              src="/collections/caps.jpg"
+              alt="Streetwear Hero"
+              className="hero-img"
+            />
           </picture>
         </div>
       </section>
@@ -60,31 +73,38 @@ export default function Home() {
 
       {/* Offers Section */}
       {(loadingOffers || offerProducts.length > 0) && (
-        <section className="offers-section container" style={{ paddingTop: '5rem' }}>
+        <section
+          className="offers-section container"
+          style={{ paddingTop: "5rem" }}
+        >
           <div className="section-header text-center">
             <p className="section-label">Limited Time Only</p>
             <h2 className="section-title">Special Offers</h2>
           </div>
           <div className="offers-scroller">
-            {loadingOffers ? (
-              Array.from({ length: 4 }).map((_, idx) => (
-                <div key={idx} className="offer-card-wrapper">
-                  <div className="cat-card skeleton" style={{height: '420px', borderRadius: 'var(--radius)'}}></div>
-                </div>
-              ))
-            ) : (
-              offerProducts.map(p => (
-                <div key={p._id} className="offer-card-wrapper">
-                  <ProductCard product={p} />
-                </div>
-              ))
-            )}
+            {loadingOffers
+              ? Array.from({ length: 4 }).map((_, idx) => (
+                  <div key={idx} className="offer-card-wrapper">
+                    <div
+                      className="cat-card skeleton"
+                      style={{ height: "420px", borderRadius: "var(--radius)" }}
+                    ></div>
+                  </div>
+                ))
+              : offerProducts.map((p) => (
+                  <div key={p._id} className="offer-card-wrapper">
+                    <ProductCard product={p} />
+                  </div>
+                ))}
           </div>
         </section>
       )}
 
       {/* Dynamic Categories */}
-      <section className="categories-section container" style={{ paddingTop: offerProducts.length > 0 ? '2rem' : '5rem' }}>
+      <section
+        className="categories-section container"
+        style={{ paddingTop: offerProducts.length > 0 ? "2rem" : "5rem" }}
+      >
         <div className="section-header text-center">
           <p className="section-label">Shop by</p>
           <h2 className="section-title">Category</h2>
@@ -97,17 +117,32 @@ export default function Home() {
             ))
           ) : (
             <>
-              {categories.filter(c => c.active !== false).map((cat) => (
-                <Link key={cat._id} to={`/products?category=${cat.slug}`} className="cat-card">
-                  <img src={cat.image || '/collections/caps.jpg'} alt={cat.name} className="cat-img"/>
-                  <div className="cat-overlay">
-                    <h3 className="cat-title">{cat.name}</h3>
-                    <span className="cat-link">Shop Now →</span>
-                  </div>
-                </Link>
-              ))}
+              {categories
+                .filter((c) => c.active !== false)
+                .map((cat) => (
+                  <Link
+                    key={cat._id}
+                    to={`/products?category=${cat.slug}`}
+                    className="cat-card"
+                  >
+                    <img
+                      src={cat.image || "/collections/caps.jpg"}
+                      alt={cat.name}
+                      className="cat-img"
+                    />
+                    <div className="cat-overlay">
+                      <h3 className="cat-title">{cat.name}</h3>
+                      <span className="cat-link">Shop Now →</span>
+                    </div>
+                  </Link>
+                ))}
               {categories.length === 0 && (
-                <p className="empty-text text-center" style={{gridColumn: '1/-1', width: '100%'}}>No categories found.</p>
+                <p
+                  className="empty-text text-center"
+                  style={{ gridColumn: "1/-1", width: "100%" }}
+                >
+                  No categories found.
+                </p>
               )}
             </>
           )}
