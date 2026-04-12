@@ -17,7 +17,7 @@ export default function AdminDashboard() {
 
     Promise.all([
       fetch("/api/products").then((res) => res.json()),
-      fetch("/api/admin/orders", {
+      fetch("/api/admin_orders", {
         headers: { Authorization: `Bearer ${token}` },
       }).then(async (res) => {
         if (res.status === 401) {
@@ -31,7 +31,7 @@ export default function AdminDashboard() {
         }
         return res.json();
       }),
-      fetch("/api/admin/revenue", {
+      fetch("/api/admin_revenue", {
         headers: { Authorization: `Bearer ${token}` },
       }).then((res) => (res.ok ? res.json() : null)),
     ])

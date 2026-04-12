@@ -7,7 +7,7 @@ export default function AdminOrders() {
   const fetchOrders = async () => {
     const token = localStorage.getItem('myou_admin_token');
     try {
-      const res = await fetch('/api/admin/orders', {
+      const res = await fetch('/api/admin_orders', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -25,7 +25,7 @@ export default function AdminOrders() {
     setOrders(prev => prev.map(o => o._id === id ? { ...o, status: newStatus } : o));
 
     try {
-      const res = await fetch(`/api/admin/orders?id=${id}`, {
+      const res = await fetch(`/api/admin_orders?id=${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ status: newStatus })

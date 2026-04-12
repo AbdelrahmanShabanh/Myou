@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import { connectDB } from '../_lib/db.js';
-import User from '../_lib/models/User.js';
+import { connectDB } from './_lib/db.js';
+import User from './_lib/models/User.js';
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();

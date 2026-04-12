@@ -1,5 +1,5 @@
-import { connectDB, Order } from "../_lib/db.js";
-import { verifyAdmin } from "../_lib/auth.js";
+import { connectDB, Order } from "./_lib/db.js";
+import { verifyAdmin } from "./_lib/auth.js";
 
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
@@ -66,7 +66,7 @@ export default async function handler(req, res) {
 
     return res.status(405).json({ error: "Method not allowed" });
   } catch (err) {
-    console.error("Error in /api/admin/orders:", err);
+    console.error("Error in /api/admin_orders:", err);
     return res.status(500).json({ error: err.message, stack: err.stack });
   }
 }
