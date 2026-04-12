@@ -10,10 +10,16 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     if (id) {
-      const category = await Category.findById(id);
+      const category = await Category.findById(id).populate('parent');
       return res.json(category);
     } else {
-      const categories = await Category.find({ active: true });
+      const parentOnly = req.query.parents === 'true';
+      const activeOnly = req.query.all !== 'true'; // if 'all' is passed, fetch including inactive
+      const query = {};
+      if (activeOnly) query.active = true;
+      if (parentOnly) query.parent = null;
+      
+      const categories = await Category.find(query).populate('parent');
       return res.json(categories);
     }
   }
@@ -50,6 +56,11 @@ export default async function handler(req, res) {
     const count = await Product.countDocuments({ category: category.slug });
     if (count > 0) {
       return res.status(400).json({ error: 'Cannot delete a category that has products.' });
+    }
+    
+    const subCount = await Category.countDocuments({ parent: id });
+    if (subCount > 0) {
+      return res.status(400).json({ error: 'Cannot delete a category that has subcategories.' });
     }
     
     await Category.findByIdAndDelete(id);

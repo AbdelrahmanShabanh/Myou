@@ -12,6 +12,7 @@ export default function AdminCategories() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
+  const [parent, setParent] = useState('');
   const [active, setActive] = useState(true);
   const [uploading, setUploading] = useState(false);
 
@@ -21,7 +22,8 @@ export default function AdminCategories() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('/api/categories');
+      // By using ?all=true we can see active and inactive, and no parent=true to see subcategories
+      const res = await fetch('/api/categories?all=true');
       const data = await res.json();
       if (Array.isArray(data)) setCategories(data);
     } catch(err) {
@@ -61,6 +63,7 @@ export default function AdminCategories() {
     setName('');
     setDescription('');
     setImage('');
+    setParent('');
     setActive(true);
     setShowModal(true);
   };
@@ -70,6 +73,7 @@ export default function AdminCategories() {
     setName(cat.name);
     setDescription(cat.description || '');
     setImage(cat.image || '');
+    setParent(cat.parent ? cat.parent._id || cat.parent : '');
     setActive(cat.active);
     setShowModal(true);
   };
@@ -111,11 +115,14 @@ export default function AdminCategories() {
     const url = editId ? `/api/categories?id=${editId}` : '/api/categories';
     const method = editId ? 'PUT' : 'POST';
     
+    // Only send parent ID if we selected one
+    const payload = { name, description, image, active, parent: parent || null };
+    
     try {
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ name, description, image, active })
+        body: JSON.stringify(payload)
       });
       
       const data = await res.json();
@@ -148,6 +155,7 @@ export default function AdminCategories() {
             <tr>
               <th>Image</th>
               <th>Name</th>
+              <th>Parent</th>
               <th>Slug</th>
               <th>Active</th>
               <th style={{textAlign: 'right'}}>Actions</th>
@@ -160,6 +168,7 @@ export default function AdminCategories() {
                   {c.image ? <img src={c.image} alt={c.name} style={{width: 40, height: 40, objectFit: 'cover', borderRadius: '4px'}}/> : '-'}
                 </td>
                 <td><strong>{c.name}</strong></td>
+                <td>{c.parent ? <span className="mono-id">{c.parent.name || c.parent.slug || 'Unknown'}</span> : <em style={{color: 'var(--text-subtle)', fontSize: '0.85rem'}}>Main</em>}</td>
                 <td><span className="mono-id">{c.slug}</span></td>
                 <td>
                   <button onClick={() => toggleActive(c)} style={{
@@ -193,6 +202,22 @@ export default function AdminCategories() {
               </div>
               <div style={{fontSize: '11px', color: 'var(--text-subtle)', marginBottom: '1rem', marginTop: '-0.5rem'}}>
                 Preview Slug: {generatedSlug || '...'}
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Parent Category</label>
+                <select 
+                  className="form-input" 
+                  value={parent} 
+                  onChange={e => setParent(e.target.value)}
+                >
+                  <option value="">None (Main Category)</option>
+                  {categories.map(c => 
+                    c._id !== editId ? (
+                      <option key={c._id} value={c._id}>{c.name}</option>
+                    ) : null
+                  )}
+                </select>
               </div>
               
               <div className="form-group">
