@@ -24,7 +24,8 @@ export default function AdminLogin() {
       if (!res.ok) throw new Error(data.error || "Login failed");
 
       localStorage.setItem("myou_admin_token", data.token);
-      window.location.href = "/admin/dashboard"; // use window.location to force full reload so Navbar detects token
+      window.dispatchEvent(new Event("storage")); // Dispatch event so Navbar detects login without reload
+      navigate("/admin/dashboard");
     } catch (err) {
       setError(err.message);
     } finally {
