@@ -16,7 +16,7 @@ export default function Home() {
       .then(data => Array.isArray(data) && setDiscounts(data))
       .catch(() => {});
       
-    fetch('/api/categories')
+    fetch('/api/categories?parents=true')
       .then(r => r.json())
       .then(data => {
         if(Array.isArray(data)) setCategories(data);
@@ -45,7 +45,6 @@ export default function Home() {
           <p className="hero-subtitle">Premium Handpicked quality, unmatched aesthetic.</p>
           <div className="hero-cta">
             <Link to="/products" className="btn btn-primary btn-lg">Shop New Drops</Link>
-            <Link to="/products?category=modest-wear" className="btn btn-outline btn-lg">View Modest Wear</Link>
           </div>
         </div>
         <div className="hero-bg">

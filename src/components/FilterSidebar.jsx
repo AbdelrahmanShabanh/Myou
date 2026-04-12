@@ -1,19 +1,8 @@
-import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
-export default function FilterSidebar({ filters, onChange }) {
+export default function FilterSidebar({ filters, onChange, categories }) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
-    fetch('/api/categories')
-      .then(r => r.json())
-      .then(data => {
-        if (Array.isArray(data)) setCategories(data);
-      })
-      .catch(() => {});
-  }, []);
 
   const handleCategory = (cat) => {
     onChange({ ...filters, category: filters.category === cat ? '' : cat });
@@ -35,6 +24,9 @@ export default function FilterSidebar({ filters, onChange }) {
 
   const hasFilters = filters.category || filters.sizes?.length > 0 || filters.maxPrice < 600;
 
+  const mainCategories = categories.filter(c => !c.parent);
+  const getSubcategories = (parentId) => categories.filter(c => c.parent && (c.parent._id === parentId || c.parent === parentId));
+
   return (
     <aside className="filter-sidebar">
       <div className="filter-header">
@@ -47,15 +39,33 @@ export default function FilterSidebar({ filters, onChange }) {
       <div className="filter-section">
         <p className="filter-section-label">Category</p>
         <div className="category-pills">
-          {categories.map(cat => (
-            <button
-              key={cat._id}
-              className={`cat-pill ${filters.category === cat.slug ? 'active' : ''}`}
-              onClick={() => handleCategory(cat.slug)}
-            >
-              {cat.name}
-            </button>
-          ))}
+          {mainCategories.map(cat => {
+            const subCats = getSubcategories(cat._id);
+            const isExpanded = filters.category === cat.slug || subCats.some(sub => sub.slug === filters.category);
+            return (
+              <div key={cat._id} className="category-group">
+                <button
+                  className={`cat-pill ${filters.category === cat.slug ? 'active' : ''}`}
+                  onClick={() => handleCategory(cat.slug)}
+                >
+                  {cat.name}
+                </button>
+                {isExpanded && subCats.length > 0 && (
+                  <div className="subcategories">
+                    {subCats.map(sub => (
+                      <button
+                        key={sub._id}
+                        className={`cat-pill sub-pill ${filters.category === sub.slug ? 'active' : ''}`}
+                        onClick={() => handleCategory(sub.slug)}
+                      >
+                        ↳ {sub.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -150,7 +160,22 @@ export default function FilterSidebar({ filters, onChange }) {
           flex-direction: column;
           gap: 0.4rem;
         }
+        .category-group {
+          display: flex;
+          flex-direction: column;
+          gap: 0.2rem;
+        }
+        .subcategories {
+          display: flex;
+          flex-direction: column;
+          gap: 0.2rem;
+          margin-top: 0.2rem;
+          margin-left: 0.8rem;
+          padding-left: 0.4rem;
+          border-left: 1px solid var(--border);
+        }
         .cat-pill {
+          width: 100%;
           padding: 0.55rem 0.9rem;
           border-radius: var(--radius-sm);
           background: var(--bg-elevated);
@@ -163,11 +188,26 @@ export default function FilterSidebar({ filters, onChange }) {
           cursor: pointer;
           transition: var(--transition);
         }
+        .sub-pill {
+          padding: 0.45rem 0.8rem;
+          font-size: 0.78rem;
+          background: transparent;
+          border-color: transparent;
+          color: var(--text-muted);
+        }
+        .sub-pill:hover {
+          background: var(--bg-elevated);
+          border-color: var(--border);
+        }
         .cat-pill:hover { color: var(--text); border-color: #444; }
         .cat-pill.active {
           background: var(--accent);
           color: var(--primary);
           border-color: var(--accent);
+        }
+        .sub-pill.active {
+          background: var(--accent);
+          color: var(--primary);
         }
         .size-grid {
           display: grid;

@@ -26,7 +26,7 @@ export default function AdminProducts() {
 
   useEffect(() => { 
     fetchProducts();
-    fetch('/api/categories').then(r => r.json()).then(data => {
+    fetch('/api/categories?all=true').then(r => r.json()).then(data => {
       if (Array.isArray(data)) setCategories(data);
     }).catch(() => {});
   }, []);
@@ -217,8 +217,13 @@ export default function AdminProducts() {
                   <label className="form-label">Category</label>
                   <select name="category" className="form-input form-select" required value={formData.category} onChange={handleChange}>
                     <option value="">Select a category</option>
-                    {categories.map(c => (
-                      <option key={c._id} value={c.slug}>{c.name}</option>
+                    {categories.filter(c => !c.parent).map(mainCat => (
+                      <optgroup key={mainCat._id} label={mainCat.name}>
+                        <option value={mainCat.slug}>{mainCat.name} (Main)</option>
+                        {categories.filter(sub => sub.parent && (sub.parent._id === mainCat._id || sub.parent === mainCat._id)).map(subCat => (
+                          <option key={subCat._id} value={subCat.slug}>↳ {subCat.name}</option>
+                        ))}
+                      </optgroup>
                     ))}
                   </select>
                 </div>
