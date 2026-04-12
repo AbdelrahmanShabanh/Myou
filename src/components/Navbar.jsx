@@ -9,12 +9,15 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [categories, setCategories] = useState([]);
   const location = useLocation();
-  const [isAdmin, setIsAdmin] = useState(!!localStorage.getItem('myou_admin_token'));
+  const [isAdmin, setIsAdmin] = useState(
+    !!localStorage.getItem("myou_admin_token"),
+  );
 
   useEffect(() => {
-    const handleStorage = () => setIsAdmin(!!localStorage.getItem('myou_admin_token'));
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    const handleStorage = () =>
+      setIsAdmin(!!localStorage.getItem("myou_admin_token"));
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
   const toggleMobileCat = (id) => {
