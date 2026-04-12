@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useCart } from '../context/CartContext.jsx';
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { useCart } from "../context/CartContext.jsx";
 
 export default function Navbar() {
   const { cartCount, toggleCart } = useCart();
@@ -9,23 +9,24 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [categories, setCategories] = useState([]);
   const location = useLocation();
-  const isAdmin = !!localStorage.getItem('myou_admin_token');
+  const isAdmin = !!localStorage.getItem("myou_admin_token");
 
   const toggleMobileCat = (id) => {
-    setOpenMobileCats(prev => ({ ...prev, [id]: !prev[id] }));
+    setOpenMobileCats((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   useEffect(() => {
-    fetch('/api/categories?all=true')
-      .then(r => r.json())
-      .then(data => {
-        if (Array.isArray(data)) setCategories(data.filter(c => c.active !== false));
+    fetch("/api/categories?all=true")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data))
+          setCategories(data.filter((c) => c.active !== false));
       })
       .catch(() => {});
-      
+
     const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
@@ -33,107 +34,207 @@ export default function Navbar() {
   }, [location]);
 
   return (
-    <nav className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`}>
+    <nav className={`navbar ${scrolled ? "navbar-scrolled" : ""}`}>
       <div className="container navbar-inner">
         <Link to="/" className="navbar-logo">
-         <img src="/collections/Gemini_Generated_Image_uai0qyuai0qyuai0-removebg-preview.png" alt="Logo" className="logo-img" />
+          <img
+            src="/collections/Gemini_Generated_Image_uai0qyuai0qyuai0-removebg-preview.png"
+            alt="Logo"
+            className="logo-img"
+          />
         </Link>
 
         <div className="navbar-links">
-          <Link to="/" className={location.pathname === '/' ? 'nav-link active' : 'nav-link'}>Home</Link>
-          
-          {categories.filter(c => !c.parent).map(mainCat => {
-            const subCats = categories.filter(c => c.parent && (c.parent._id === mainCat._id || c.parent === mainCat._id));
-            const isActive = location.search.includes(`category=${mainCat.slug}`) || subCats.some(s => location.search.includes(`category=${s.slug}`));
-            
-            return (
-              <div key={mainCat._id} className={subCats.length > 0 ? "nav-dropdown-container" : ""}>
-                <Link to={`/products?category=${mainCat.slug}`} className={`nav-link ${isActive ? 'active' : ''}`} style={{textTransform: 'capitalize'}}>
-                  {mainCat.name}
-                </Link>
-                {subCats.length > 0 && (
-                  <div className="nav-dropdown">
-                    <div className="dropdown-sub-menu">
-                      {subCats.map(sub => (
-                        <Link key={sub._id} to={`/products?category=${sub.slug}`} className="dropdown-link" style={{textTransform: 'capitalize'}}>
-                          {sub.name}
-                        </Link>
-                      ))}
+          <Link
+            to="/"
+            className={
+              location.pathname === "/" ? "nav-link active" : "nav-link"
+            }
+          >
+            Home
+          </Link>
+
+          {categories
+            .filter((c) => !c.parent)
+            .map((mainCat) => {
+              const subCats = categories.filter(
+                (c) =>
+                  c.parent &&
+                  (c.parent._id === mainCat._id || c.parent === mainCat._id),
+              );
+              const isActive =
+                location.search.includes(`category=${mainCat.slug}`) ||
+                subCats.some((s) =>
+                  location.search.includes(`category=${s.slug}`),
+                );
+
+              return (
+                <div
+                  key={mainCat._id}
+                  className={subCats.length > 0 ? "nav-dropdown-container" : ""}
+                >
+                  <Link
+                    to={`/products?category=${mainCat.slug}`}
+                    className={`nav-link ${isActive ? "active" : ""}`}
+                    style={{ textTransform: "capitalize" }}
+                  >
+                    {mainCat.name}
+                  </Link>
+                  {subCats.length > 0 && (
+                    <div className="nav-dropdown">
+                      <div className="dropdown-sub-menu">
+                        {subCats.map((sub) => (
+                          <Link
+                            key={sub._id}
+                            to={`/products?category=${sub.slug}`}
+                            className="dropdown-link"
+                            style={{ textTransform: "capitalize" }}
+                          >
+                            {sub.name}
+                          </Link>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-          
-          <Link to="/track-order" className="nav-link">Track Order</Link>
-          {isAdmin && <Link to="/admin/dashboard" className="nav-link nav-admin">Admin</Link>}
+                  )}
+                </div>
+              );
+            })}
+
+          <Link to="/track-order" className="nav-link">
+            Track Order
+          </Link>
+          {isAdmin && (
+            <Link to="/admin/dashboard" className="nav-link nav-admin">
+              Admin
+            </Link>
+          )}
         </div>
 
         <div className="navbar-actions">
           {!isAdmin && (
-            <Link to="/admin/login" className="cart-btn" aria-label="Admin Login">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <Link
+              to="/admin/login"
+              className="cart-btn"
+              aria-label="Admin Login"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
             </Link>
           )}
           <button className="cart-btn" aria-label="Cart" onClick={toggleCart}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <circle cx="9" cy="21" r="1" />
+              <circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
             </svg>
             {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
           </button>
 
           <button
-            className={`hamburger ${menuOpen ? 'open' : ''}`}
-            onClick={() => setMenuOpen(v => !v)}
+            className={`hamburger ${menuOpen ? "open" : ""}`}
+            onClick={() => setMenuOpen((v) => !v)}
             aria-label="Toggle menu"
           >
-            <span/><span/><span/>
+            <span />
+            <span />
+            <span />
           </button>
         </div>
       </div>
 
       {menuOpen && (
         <div className="mobile-menu">
-          <Link to="/" className="mobile-link">Home</Link>
-          
-          {categories.filter(c => !c.parent).map(mainCat => {
-            const subCats = categories.filter(c => c.parent && (c.parent._id === mainCat._id || c.parent === mainCat._id));
-            if (subCats.length > 0) {
-              const isOpen = openMobileCats[mainCat._id];
-              return (
-                <div key={mainCat._id} className="mobile-dropdown-container">
-                  <div className="mobile-link mobile-dropdown-header" onClick={() => toggleMobileCat(mainCat._id)}>
-                    <span style={{textTransform: 'capitalize'}}>{mainCat.name}</span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s'}}>
-                      <path d="M6 9l6 6 6-6"/>
-                    </svg>
-                  </div>
-                  {isOpen && (
-                    <div className="mobile-dropdown-content">
-                      {subCats.map(sub => (
-                        <Link key={sub._id} to={`/products?category=${sub.slug}`} className="mobile-sub-link nested" style={{textTransform: 'capitalize'}}>
-                          {sub.name}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
+          <Link to="/" className="mobile-link">
+            Home
+          </Link>
+
+          {categories
+            .filter((c) => !c.parent)
+            .map((mainCat) => {
+              const subCats = categories.filter(
+                (c) =>
+                  c.parent &&
+                  (c.parent._id === mainCat._id || c.parent === mainCat._id),
               );
-            }
-            return (
-              <Link key={mainCat._id} to={`/products?category=${mainCat.slug}`} className="mobile-link" style={{textTransform: 'capitalize'}}>
-                {mainCat.name}
-              </Link>
-            );
-          })}
-          
-          <Link to="/track-order" className="mobile-link">Track Order</Link>
-          {isAdmin && <Link to="/admin/dashboard" className="mobile-link mobile-admin">Admin</Link>}
+              if (subCats.length > 0) {
+                const isOpen = openMobileCats[mainCat._id];
+                return (
+                  <div key={mainCat._id} className="mobile-dropdown-container">
+                    <div
+                      className="mobile-link mobile-dropdown-header"
+                      onClick={() => toggleMobileCat(mainCat._id)}
+                    >
+                      <span style={{ textTransform: "capitalize" }}>
+                        {mainCat.name}
+                      </span>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        style={{
+                          transform: isOpen ? "rotate(180deg)" : "none",
+                          transition: "transform 0.2s",
+                        }}
+                      >
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </div>
+                    {isOpen && (
+                      <div className="mobile-dropdown-content">
+                        {subCats.map((sub) => (
+                          <Link
+                            key={sub._id}
+                            to={`/products?category=${sub.slug}`}
+                            className="mobile-sub-link nested"
+                            style={{ textTransform: "capitalize" }}
+                          >
+                            {sub.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+              return (
+                <Link
+                  key={mainCat._id}
+                  to={`/products?category=${mainCat.slug}`}
+                  className="mobile-link"
+                  style={{ textTransform: "capitalize" }}
+                >
+                  {mainCat.name}
+                </Link>
+              );
+            })}
+
+          <Link to="/track-order" className="mobile-link">
+            Track Order
+          </Link>
+          {isAdmin && (
+            <Link to="/admin/dashboard" className="mobile-link mobile-admin">
+              Admin
+            </Link>
+          )}
         </div>
       )}
 
