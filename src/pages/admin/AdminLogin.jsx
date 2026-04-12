@@ -1,30 +1,30 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const res = await fetch('/api/admin_login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+      const res = await fetch("/api/admin_login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      
-      if (!res.ok) throw new Error(data.error || 'Login failed');
 
-      localStorage.setItem('myou_admin_token', data.token);
-      window.location.href = '/admin/dashboard'; // use window.location to force full reload so Navbar detects token
+      if (!res.ok) throw new Error(data.error || "Login failed");
+
+      localStorage.setItem("myou_admin_token", data.token);
+      window.location.href = "/admin/dashboard"; // use window.location to force full reload so Navbar detects token
     } catch (err) {
       setError(err.message);
     } finally {
@@ -43,26 +43,30 @@ export default function AdminLogin() {
         <form onSubmit={handleLogin}>
           <div className="form-group">
             <label className="form-label">Email Address</label>
-            <input 
-              type="email" 
-              className="form-input" 
-              value={email} 
-              onChange={e => setEmail(e.target.value)} 
-              required 
+            <input
+              type="email"
+              className="form-input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           <div className="form-group mb-6">
             <label className="form-label">Password</label>
-            <input 
-              type="password" 
-              className="form-input" 
-              value={password} 
-              onChange={e => setPassword(e.target.value)} 
-              required 
+            <input
+              type="password"
+              className="form-input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
-          <button type="submit" className="btn btn-primary btn-lg full-width" disabled={loading}>
-            {loading ? 'Authenticating...' : 'Sign In'}
+          <button
+            type="submit"
+            className="btn btn-primary btn-lg full-width"
+            disabled={loading}
+          >
+            {loading ? "Authenticating..." : "Sign In"}
           </button>
         </form>
       </div>

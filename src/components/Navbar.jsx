@@ -5,17 +5,32 @@ import { useCart } from '../context/CartContext.jsx';
 export default function Navbar() {
   const { cartCount, toggleCart } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openMobileCats, setOpenMobileCats] = useState({});
   const [scrolled, setScrolled] = useState(false);
+  const [categories, setCategories] = useState([]);
   const location = useLocation();
   const isAdmin = !!localStorage.getItem('myou_admin_token');
 
+  const toggleMobileCat = (id) => {
+    setOpenMobileCats(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
   useEffect(() => {
+    fetch('/api/categories?all=true')
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) setCategories(data.filter(c => c.active !== false));
+      })
+      .catch(() => {});
+      
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => setMenuOpen(false), [location]);
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location]);
 
   return (
     <nav className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`}>
@@ -26,7 +41,31 @@ export default function Navbar() {
 
         <div className="navbar-links">
           <Link to="/" className={location.pathname === '/' ? 'nav-link active' : 'nav-link'}>Home</Link>
-          <Link to="/products" className={location.pathname === '/products' ? 'nav-link active' : 'nav-link'}>Shop</Link>
+          
+          {categories.filter(c => !c.parent).map(mainCat => {
+            const subCats = categories.filter(c => c.parent && (c.parent._id === mainCat._id || c.parent === mainCat._id));
+            const isActive = location.search.includes(`category=${mainCat.slug}`) || subCats.some(s => location.search.includes(`category=${s.slug}`));
+            
+            return (
+              <div key={mainCat._id} className={subCats.length > 0 ? "nav-dropdown-container" : ""}>
+                <Link to={`/products?category=${mainCat.slug}`} className={`nav-link ${isActive ? 'active' : ''}`} style={{textTransform: 'capitalize'}}>
+                  {mainCat.name}
+                </Link>
+                {subCats.length > 0 && (
+                  <div className="nav-dropdown">
+                    <div className="dropdown-sub-menu">
+                      {subCats.map(sub => (
+                        <Link key={sub._id} to={`/products?category=${sub.slug}`} className="dropdown-link" style={{textTransform: 'capitalize'}}>
+                          {sub.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          
           <Link to="/track-order" className="nav-link">Track Order</Link>
           {isAdmin && <Link to="/admin/dashboard" className="nav-link nav-admin">Admin</Link>}
         </div>
@@ -61,9 +100,39 @@ export default function Navbar() {
       {menuOpen && (
         <div className="mobile-menu">
           <Link to="/" className="mobile-link">Home</Link>
-          <Link to="/products" className="mobile-link">Shop</Link>
+          
+          {categories.filter(c => !c.parent).map(mainCat => {
+            const subCats = categories.filter(c => c.parent && (c.parent._id === mainCat._id || c.parent === mainCat._id));
+            if (subCats.length > 0) {
+              const isOpen = openMobileCats[mainCat._id];
+              return (
+                <div key={mainCat._id} className="mobile-dropdown-container">
+                  <div className="mobile-link mobile-dropdown-header" onClick={() => toggleMobileCat(mainCat._id)}>
+                    <span style={{textTransform: 'capitalize'}}>{mainCat.name}</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s'}}>
+                      <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                  </div>
+                  {isOpen && (
+                    <div className="mobile-dropdown-content">
+                      {subCats.map(sub => (
+                        <Link key={sub._id} to={`/products?category=${sub.slug}`} className="mobile-sub-link nested" style={{textTransform: 'capitalize'}}>
+                          {sub.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+            return (
+              <Link key={mainCat._id} to={`/products?category=${mainCat.slug}`} className="mobile-link" style={{textTransform: 'capitalize'}}>
+                {mainCat.name}
+              </Link>
+            );
+          })}
+          
           <Link to="/track-order" className="mobile-link">Track Order</Link>
-          <button className="mobile-link" onClick={toggleCart} style={{background:'none',border:'none',fontFamily:'inherit',textAlign:'left',width:'100%',cursor:'pointer'}}>Cart {cartCount > 0 && `(${cartCount})`}</button>
           {isAdmin && <Link to="/admin/dashboard" className="mobile-link mobile-admin">Admin</Link>}
         </div>
       )}
@@ -136,6 +205,79 @@ export default function Navbar() {
           color: var(--accent) !important;
           border: 1px solid var(--accent);
         }
+        
+        .nav-dropdown-container {
+          position: relative;
+        }
+        
+        .nav-dropdown {
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%) translateY(10px);
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+          min-width: 180px;
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.2s ease;
+          z-index: 100;
+          padding: 0.5rem 0;
+          pointer-events: none;
+        }
+        
+        .nav-dropdown-container:hover .nav-dropdown {
+          opacity: 1;
+          visibility: visible;
+          transform: translateX(-50%) translateY(0);
+          pointer-events: auto;
+        }
+        
+        .dropdown-item-container {
+          position: relative;
+        }
+        
+        .dropdown-group-title {
+          display: block;
+          padding: 0.75rem 1.25rem;
+          font-weight: 700;
+          color: var(--text);
+          cursor: default;
+          font-size: 0.85rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        
+        .dropdown-sub-menu {
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .dropdown-link {
+          display: block;
+          padding: 0.6rem 1.25rem;
+          color: var(--text-muted);
+          text-decoration: none;
+          font-size: 0.9rem;
+          transition: background 0.2s, color 0.2s;
+        }
+        
+        .main-direct-link {
+          padding-left: 1.25rem;
+          font-weight: 700;
+          color: var(--text);
+          font-size: 0.85rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        
+        .dropdown-link:hover {
+          background: var(--bg-elevated);
+          color: var(--accent);
+        }
+
         .navbar-actions {
           display: flex;
           align-items: center;
@@ -224,9 +366,65 @@ export default function Navbar() {
         .mobile-link:hover { color: var(--accent); }
         .mobile-admin { color: var(--accent) !important; }
 
+        .mobile-dropdown-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          cursor: pointer;
+          width: 100%;
+        }
+        .mobile-dropdown-content {
+          display: flex;
+          flex-direction: column;
+          background: rgba(0,0,0,0.03);
+          border-radius: var(--radius-sm);
+          margin: 0 0 0.5rem 0;
+          padding: 0.5rem 0;
+          overflow: hidden;
+        }
+        .mobile-sub-link {
+          padding: 0.6rem 1.5rem;
+          color: #6f636b;
+          text-decoration: none;
+          font-size: 0.95rem;
+          border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        .mobile-sub-link:last-child {
+          border-bottom: none;
+        }
+        .mobile-group-title {
+          padding: 0.8rem 1.5rem 0.4rem;
+          font-weight: 700;
+          font-size: 0.85rem;
+          color: var(--text);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .mobile-group-title.link {
+          display: block;
+          text-decoration: none;
+          padding-bottom: 0.8rem;
+          border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        .mobile-sub-link.nested {
+          padding-left: 2.5rem;
+          font-size: 0.9rem;
+        }
+
         @media (max-width: 768px) {
-          .navbar-links { display: none; }
-          .hamburger { display: flex; }
+          .navbar-links { display: none !important; }
+          .hamburger { display: flex !important; }
+          .navbar-inner { gap: 0.5rem; padding: 0 1rem; }
+          .mobile-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: rgb(255 255 255 / 95%);
+            backdrop-filter: blur(20px);
+            z-index: 99;
+          }
         }
         @media (min-width: 769px) {
           .mobile-menu { display: none !important; }
