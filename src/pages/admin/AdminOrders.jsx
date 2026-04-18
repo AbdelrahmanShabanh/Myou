@@ -115,23 +115,23 @@ export default function AdminOrders() {
                         padding: "0.15rem 0.4rem",
                         borderRadius: "4px",
                         background:
-                          order.paymentMethod === "instapay"
+                          (order.paymentMethod === "instapay" || order.paymentMethod === "vodafone_cash")
                             ? "var(--color-accent-soft)"
                             : "var(--bg-elevated)",
                         color:
-                          order.paymentMethod === "instapay"
+                          (order.paymentMethod === "instapay" || order.paymentMethod === "vodafone_cash")
                             ? "var(--color-accent)"
                             : "var(--text-muted)",
                       }}
                     >
-                      {order.paymentMethod === "instapay" ? "InstaPay" : "COD"}
+                      {order.paymentMethod === "instapay" ? "InstaPay" : order.paymentMethod === "vodafone_cash" ? "Vodafone Cash" : "COD"}
                     </span>
                   </div>
-                  {order.paymentMethod === "instapay" &&
-                    order.instapayScreenshot && (
+                  {(order.paymentMethod === "instapay" || order.paymentMethod === "vodafone_cash") &&
+                    (order.instapayScreenshot || order.vodafoneScreenshot) && (
                       <div style={{ marginTop: "8px" }}>
                         <a
-                          href={order.instapayScreenshot}
+                          href={order.instapayScreenshot || order.vodafoneScreenshot}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{

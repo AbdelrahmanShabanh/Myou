@@ -38,8 +38,9 @@ const OrderSchema = new mongoose.Schema({
   }],
   total: { type: Number, required: true },
   status: { type: String, enum: ['pending', 'confirmed', 'delivered', 'cancelled'], default: 'pending' },
-  paymentMethod: { type: String, enum: ['cash_on_delivery', 'instapay'], default: 'cash_on_delivery' },
+  paymentMethod: { type: String, enum: ['cash_on_delivery', 'instapay', 'vodafone_cash'], default: 'cash_on_delivery' },
   instapayScreenshot: { type: String },
+  vodafoneScreenshot: { type: String },
   notes: String,
   createdAt: { type: Date, default: Date.now }
 });

@@ -42,7 +42,7 @@ export default function Checkout() {
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [showReturnPolicy, setShowReturnPolicy] = useState(false);
-  const [hasClickedInstapay, setHasClickedInstapay] = useState(false);
+  const [hasCopiedVodafone, setHasCopiedVodafone] = useState(false);
   const [discountCode, setDiscountCode] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState(null);
   const [discountError, setDiscountError] = useState("");
@@ -111,7 +111,7 @@ export default function Checkout() {
       .join("\n");
 
     const govLabel = form.governorate;
-    const payment = paymentMethod === "cash" ? "Cash on Delivery" : "Instapay (redirected)";
+    const payment = paymentMethod === "cash" ? "Cash on Delivery" : "Vodafone Cash";
 
     let msgStr = `*New Order from ${form.fullName}*\n\n`;
     let body = 
@@ -171,7 +171,7 @@ export default function Checkout() {
           address: form.address,
           items: orderItems,
           total: finalTotal,
-          paymentMethod: paymentMethod === 'cash' ? 'cash_on_delivery' : 'instapay',
+          paymentMethod: paymentMethod === 'cash' ? 'cash_on_delivery' : 'vodafone_cash',
           notes: appliedDiscount ? `Discount Applied: ${appliedDiscount.code} (-${appliedDiscount.discountPercent}%)` : "",
         })
       });
@@ -298,36 +298,38 @@ export default function Checkout() {
                 <span style={{fontWeight:600}}>Cash on Delivery</span>
               </label>
 
-              <label style={{display:'flex', alignItems:'center', gap:'0.75rem', padding:'1.25rem', background:'var(--bg-elevated)', borderRadius:'var(--radius-sm)', border:paymentMethod === 'instapay' ? '2px solid var(--accent)' : '1px solid var(--border)', cursor:'pointer'}}>
+              <label style={{display:'flex', alignItems:'center', gap:'0.75rem', padding:'1.25rem', background:'var(--bg-elevated)', borderRadius:'var(--radius-sm)', border:paymentMethod === 'vodafone' ? '2px solid var(--accent)' : '1px solid var(--border)', cursor:'pointer'}}>
                 <input
                   type="radio"
                   name="payment"
-                  value="instapay"
+                  value="vodafone"
                   style={{accentColor:'var(--accent)', margin: 0, width:'18px', height:'18px'}}
-                  checked={paymentMethod === "instapay"}
+                  checked={paymentMethod === "vodafone"}
                   onChange={() => {
-                    setPaymentMethod("instapay");
-                    setHasClickedInstapay(false);
+                    setPaymentMethod("vodafone");
+                    setHasCopiedVodafone(false);
                   }}
                 />
-                <span style={{fontWeight:600}}>InstaPay</span>
+                <span style={{fontWeight:600}}>Vodafone Cash</span>
               </label>
             </div>
 
-            {/* Instapay instructions */}
-            {paymentMethod === "instapay" && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding:'1.25rem', background:'rgba(124, 58, 237, 0.1)', borderRadius:'var(--radius-sm)', color:'var(--text)' }}>
+            {/* Vodafone Cash instructions */}
+            {paymentMethod === "vodafone" && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding:'1.25rem', background:'rgba(230, 0, 0, 0.1)', borderRadius:'var(--radius-sm)', color:'var(--text)' }}>
                 <p style={{lineHeight:1.6, fontSize:'0.9rem', margin: 0}} dir="rtl">
-                  بعد النقر على زر InstaPay سيتم توجيهك إلى التطبيق، ثم يجب العودة للموقع لاستكمال الطلب وإرسال لقطة شاشة من عملية الدفع مع طلبك الى واتساب.
+                  يرجى تحويل المبلغ الإجمالي إلى رقم فودافون كاش التالي: <strong>01070831335</strong>
+                  <br />
+                  ثم النقر على "الاستمرار للدفع" وتأكيد الطلب عبر واتساب مع إرسال لقطة شاشة لعملية التحويل.
                 </p>
                 <button
                   type="button"
                   onClick={() => {
-                    setHasClickedInstapay(true);
-                    window.open("https://ipn.eg/S/agad21/instapay/0lAkAO", "_blank");
+                    navigator.clipboard.writeText("01070831335");
+                    setHasCopiedVodafone(true);
                   }}
                   style={{
-                    backgroundColor: "#7c3aed",
+                    backgroundColor: "#e60000",
                     color: "#fff",
                     padding: "0.8rem 1.5rem",
                     borderRadius: "8px",
@@ -342,7 +344,7 @@ export default function Checkout() {
                     alignSelf:'flex-start'
                   }}
                 >
-                  Pay with InstaPay
+                  {hasCopiedVodafone ? "Number Copied! ✓" : "Copy Number"}
                 </button>
               </div>
             )}
@@ -350,16 +352,16 @@ export default function Checkout() {
 
           <div style={{background:'rgba(255,255,255,0.05)', padding:'1rem', borderRadius:'8px', marginBottom:'1.5rem', fontSize:'0.9rem', lineHeight:1.5}} dir="rtl">
             <strong style={{display:'block', marginBottom:'0.5rem', color:'var(--accent)'}}>ملاحظة هامة:</strong>
-            بعد النقر على استكمال الدفع، سيتم توجيهك إلى واتساب. يجب النقر على إرسال لتأكيد الطلب.
+            بعد النقر على استكمال الدفع، سيتم توجيهك إلى واتساب. يجب النقر على إرسال لتأكيد الطلب وإرسال سكرين شوت الدفع إن وجد.
           </div>
 
           <button 
             type="submit" 
             className="btn btn-primary btn-lg"
-            disabled={paymentMethod === "instapay" && !hasClickedInstapay}
+            disabled={paymentMethod === "vodafone" && !hasCopiedVodafone}
             style={{ 
-              opacity: (paymentMethod === "instapay" && !hasClickedInstapay) ? 0.5 : 1, 
-              cursor: (paymentMethod === "instapay" && !hasClickedInstapay) ? "not-allowed" : "pointer",
+              opacity: (paymentMethod === "vodafone" && !hasCopiedVodafone) ? 0.5 : 1, 
+              cursor: (paymentMethod === "vodafone" && !hasCopiedVodafone) ? "not-allowed" : "pointer",
               transition: "all 0.3s ease",
               width: '100%',
               display: 'flex',
