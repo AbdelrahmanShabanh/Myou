@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
 
-const WHATSAPP_NUMBER = "201008872621";
+const WHATSAPP_NUMBER = "201070831335";
 
 const GOVERNORATES = [
   "Cairo", "Giza", "Alexandria", "Dakahlia", "Red Sea", "Beheira",

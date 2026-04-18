@@ -59,7 +59,7 @@ export default function Footer() {
           <p>&copy; {new Date().getFullYear()} M You. All rights reserved.</p>
           <p>
             <a
-              href="https://wa.me/201008872621"
+              href="https://wa.me/201070831335"
               target="_blank"
               rel="noreferrer"
               style={{
