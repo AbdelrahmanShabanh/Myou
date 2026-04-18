@@ -15,22 +15,59 @@ export default function Footer() {
               Premium Handpicked quality, unmatched aesthetic. Delivering fire
               fits since 2024.
             </p>
-            <div className="footer-socials" style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-              <a href="https://www.facebook.com/share/1J4wL9Gxu2/?mibextid=wwXIfr" target="_blank" rel="noreferrer" aria-label="Facebook">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <div
+              className="footer-socials"
+              style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}
+            >
+              <a
+                href="https://www.facebook.com/share/1J4wL9Gxu2/?mibextid=wwXIfr"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Facebook"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
                   <path d="M12 2.04c-5.5 0-10 4.48-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.19 2.23.19v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.54-4.5-10.02-10-10.02z" />
                 </svg>
               </a>
-              <a href="https://www.instagram.com/m.you_brand?igsh=MTcwaGZwbG5xbG16Yg==" target="_blank" rel="noreferrer" aria-label="Instagram">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <a
+                href="https://www.instagram.com/m.you_brand?igsh=MTcwaGZwbG5xbG16Yg=="
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Instagram"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                   <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                   <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                 </svg>
               </a>
-              <a href="https://www.tiktok.com/@m.youbrand?_r=1&_t=ZS-94z8keHOAw3" target="_blank" rel="noreferrer" aria-label="TikTok">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19.32 5.56C17.7 5.25 16.32 4.1 15.65 2.5H12v13.06c0 1.96-1.59 3.55-3.55 3.55S4.9 17.52 4.9 15.56s1.59-3.55 3.55-3.55c.29 0 .56.04.83.1v-3.7c-.27-.04-.55-.06-.83-.06-4 0-7.25 3.25-7.25 7.25s3.25 7.25 7.25 7.25 7.25-3.25 7.25-7.25V8.58c1.6.86 3.4 1.34 5.3 1.34V6.22c-1.12 0-2.18-.24-3.13-.66z"/>
+              <a
+                href="https://www.tiktok.com/@m.youbrand?_r=1&_t=ZS-94z8keHOAw3"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="TikTok"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M19.32 5.56C17.7 5.25 16.32 4.1 15.65 2.5H12v13.06c0 1.96-1.59 3.55-3.55 3.55S4.9 17.52 4.9 15.56s1.59-3.55 3.55-3.55c.29 0 .56.04.83.1v-3.7c-.27-.04-.55-.06-.83-.06-4 0-7.25 3.25-7.25 7.25s3.25 7.25 7.25 7.25 7.25-3.25 7.25-7.25V8.58c1.6.86 3.4 1.34 5.3 1.34V6.22c-1.12 0-2.18-.24-3.13-.66z" />
                 </svg>
               </a>
             </div>
@@ -68,10 +105,15 @@ export default function Footer() {
                 fontWeight: "bold",
               }}
             >
-              Made with ❤️ by <span style={{
-                textDecoration:"underline",
-                color:"black"
-              }}>Abdelrahman Shaban</span> 
+              Made with ❤️ by{" "}
+              <span
+                style={{
+                  textDecoration: "underline",
+                  color: "black",
+                }}
+              >
+                Abdelrahman Shaban
+              </span>
             </a>
           </p>
         </div>

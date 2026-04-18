@@ -5,29 +5,68 @@ import { useCart } from "../context/CartContext.jsx";
 const WHATSAPP_NUMBER = "201070831335";
 
 const GOVERNORATES = [
-  "Cairo", "Giza", "Alexandria", "Dakahlia", "Red Sea", "Beheira",
-  "Fayoum", "Gharbia", "Ismailia", "Menofia", "Minya", "Qalyubia",
-  "New Valley", "North Sinai", "Port Said", "Damietta", "Sharqia",
-  "South Sinai", "Suez", "Luxor", "Matrouh", "Qena", "Sohag", "Aswan", "Assiut", "Beni Suef",
+  "Cairo",
+  "Giza",
+  "Alexandria",
+  "Dakahlia",
+  "Red Sea",
+  "Beheira",
+  "Fayoum",
+  "Gharbia",
+  "Ismailia",
+  "Menofia",
+  "Minya",
+  "Qalyubia",
+  "New Valley",
+  "North Sinai",
+  "Port Said",
+  "Damietta",
+  "Sharqia",
+  "South Sinai",
+  "Suez",
+  "Luxor",
+  "Matrouh",
+  "Qena",
+  "Sohag",
+  "Aswan",
+  "Assiut",
+  "Beni Suef",
 ];
 
 const GOV_FEES = {
-  "Cairo": 100, "Giza": 100,
-  "Alexandria": 105,
-  "Dakahlia": 100, "Beheira": 100, "Gharbia": 100, "Menofia": 100, 
-  "Qalyubia": 100, "Damietta": 110, "Sharqia": 100, "Ismailia": 110, "Suez": 100,
+  Cairo: 100,
+  Giza: 100,
+  Alexandria: 105,
+  Dakahlia: 100,
+  Beheira: 100,
+  Gharbia: 100,
+  Menofia: 100,
+  Qalyubia: 100,
+  Damietta: 110,
+  Sharqia: 100,
+  Ismailia: 110,
+  Suez: 100,
   "Port Said": 60,
-  "Fayoum": 110, "Beni Suef": 110, "Minya": 110, "Assiut": 110, 
-  "Sohag": 110, "Qena": 110, "Luxor": 110, "Aswan": 110, 
-  "Red Sea": 110, "New Valley": 110, "North Sinai": 110, 
-  "South Sinai": 110, "Matrouh": 110,
+  Fayoum: 110,
+  "Beni Suef": 110,
+  Minya: 110,
+  Assiut: 110,
+  Sohag: 110,
+  Qena: 110,
+  Luxor: 110,
+  Aswan: 110,
+  "Red Sea": 110,
+  "New Valley": 110,
+  "North Sinai": 110,
+  "South Sinai": 110,
+  Matrouh: 110,
 };
 
 export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { items, cartTotal, clearCart } = useCart();
-  
+
   const searchParams = new URLSearchParams(location.search);
   const orderId = searchParams.get("orderId");
 
@@ -54,15 +93,17 @@ export default function Checkout() {
 
   // Protect route
   useEffect(() => {
-    if (items.length === 0 && !submitted) navigate('/cart', { replace: true });
+    if (items.length === 0 && !submitted) navigate("/cart", { replace: true });
   }, [items, navigate, submitted]);
 
   if (items.length === 0 && !submitted) return null;
 
   const total = cartTotal;
-  const discountValue = appliedDiscount ? (total * (appliedDiscount.discountPercent / 100)) : 0;
+  const discountValue = appliedDiscount
+    ? total * (appliedDiscount.discountPercent / 100)
+    : 0;
   const totalAfterDiscount = total - discountValue;
-  const deliveryFee = form.governorate ? (GOV_FEES[form.governorate] || 110) : 0;
+  const deliveryFee = form.governorate ? GOV_FEES[form.governorate] || 110 : 0;
   const finalTotal = totalAfterDiscount + deliveryFee;
 
   const handleApplyDiscount = async () => {
@@ -73,7 +114,8 @@ export default function Checkout() {
       const res = await fetch("/api/discounts");
       const discounts = await res.json();
       const validDiscount = discounts.find(
-        (d) => d.code && d.code.toLowerCase() === discountCode.trim().toLowerCase()
+        (d) =>
+          d.code && d.code.toLowerCase() === discountCode.trim().toLowerCase(),
       );
 
       if (validDiscount) {
@@ -107,25 +149,29 @@ export default function Checkout() {
 
   const buildWhatsAppMessage = () => {
     const itemLines = items
-      .map((item) => `• ${item.product.name} | Size: ${item.size} | Qty: ${item.qty} | Price: ${item.product.price}`)
+      .map(
+        (item) =>
+          `• ${item.product.name} | Size: ${item.size} | Qty: ${item.qty} | Price: ${item.product.price}`,
+      )
       .join("\n");
 
     const govLabel = form.governorate;
-    const payment = paymentMethod === "cash" ? "Cash on Delivery" : "Vodafone Cash";
+    const payment =
+      paymentMethod === "cash" ? "Cash on Delivery" : "Vodafone Cash";
 
     let msgStr = `*New Order from ${form.fullName}*\n\n`;
-    let body = 
+    let body =
       msgStr +
       `*Contact:*\n📞 ${form.phone}\n\n` +
       `*Address:*\n📍 ${govLabel}\n🏠 ${form.address}\n\n` +
       `📦 *Order Items*\n${itemLines}\n\n` +
       `💰 *Subtotal: LE ${total.toFixed(2)}*\n`;
-      
+
     if (appliedDiscount) {
       body += `🏷️ *Discount (${appliedDiscount.code} - ${appliedDiscount.discountPercent}%): -LE ${discountValue.toFixed(2)}*\n`;
     }
 
-    body += 
+    body +=
       `🚚 *Delivery Fee: LE ${deliveryFee.toFixed(2)}*\n` +
       `💰 *Total: LE ${finalTotal.toFixed(2)}*\n` +
       `💳 *Payment Method:* ${payment}`;
@@ -145,7 +191,7 @@ export default function Checkout() {
     const message = buildWhatsAppMessage();
     const encoded = encodeURIComponent(message);
     const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`;
-    
+
     window.open(waUrl, "_blank");
 
     // Save order to backend API
@@ -160,9 +206,9 @@ export default function Checkout() {
       }));
 
       await fetch("/api/orders", {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           customerName: form.fullName,
@@ -171,9 +217,12 @@ export default function Checkout() {
           address: form.address,
           items: orderItems,
           total: finalTotal,
-          paymentMethod: paymentMethod === 'cash' ? 'cash_on_delivery' : 'vodafone_cash',
-          notes: appliedDiscount ? `Discount Applied: ${appliedDiscount.code} (-${appliedDiscount.discountPercent}%)` : "",
-        })
+          paymentMethod:
+            paymentMethod === "cash" ? "cash_on_delivery" : "vodafone_cash",
+          notes: appliedDiscount
+            ? `Discount Applied: ${appliedDiscount.code} (-${appliedDiscount.discountPercent}%)`
+            : "",
+        }),
       });
     } catch (err) {
       console.error("Failed to save order to API:", err);
@@ -194,14 +243,31 @@ export default function Checkout() {
 
   if (submitted) {
     return (
-      <div className="checkout-success" style={{textAlign:'center', padding:'6rem 1rem'}}>
+      <div
+        className="checkout-success"
+        style={{ textAlign: "center", padding: "6rem 1rem" }}
+      >
         <div className="checkout-success-card">
-          <div className="checkout-success-icon" style={{fontSize:'3rem', color:'var(--success)', marginBottom:'1rem'}}>
+          <div
+            className="checkout-success-icon"
+            style={{
+              fontSize: "3rem",
+              color: "var(--success)",
+              marginBottom: "1rem",
+            }}
+          >
             ✓
           </div>
-          <h2 style={{marginBottom:'0.5rem'}}>Order Placed!</h2>
-          <p style={{color:'var(--text-muted)'}}>Thank you! You have been redirected to WhatsApp to complete your order.</p>
-          <span style={{display:'block', marginTop:'1rem', fontSize:'0.9rem'}}>Redirecting you to the home page…</span>
+          <h2 style={{ marginBottom: "0.5rem" }}>Order Placed!</h2>
+          <p style={{ color: "var(--text-muted)" }}>
+            Thank you! You have been redirected to WhatsApp to complete your
+            order.
+          </p>
+          <span
+            style={{ display: "block", marginTop: "1rem", fontSize: "0.9rem" }}
+          >
+            Redirecting you to the home page…
+          </span>
         </div>
       </div>
     );
@@ -210,117 +276,319 @@ export default function Checkout() {
   return (
     <div className="checkout-page container">
       <div className="checkout-grid">
-
         {/* ── LEFT COLUMN: Form ── */}
         <form className="checkout-form" onSubmit={handleSubmit} noValidate>
-          <h1 className="checkout-heading" style={{fontSize:'2rem', fontWeight:800, marginBottom:'2rem'}}>Checkout</h1>
+          <h1
+            className="checkout-heading"
+            style={{ fontSize: "2rem", fontWeight: 800, marginBottom: "2rem" }}
+          >
+            Checkout
+          </h1>
 
           {/* Shipping Address */}
           <section className="form-section">
-            <h3 className="form-section-title" style={{fontSize:'1.25rem', fontWeight:800, marginBottom:'1.5rem', paddingBottom:'0.5rem', borderBottom:'1px solid var(--border)'}}>
+            <h3
+              className="form-section-title"
+              style={{
+                fontSize: "1.25rem",
+                fontWeight: 800,
+                marginBottom: "1.5rem",
+                paddingBottom: "0.5rem",
+                borderBottom: "1px solid var(--border)",
+              }}
+            >
               Shipping Address
             </h3>
 
             <div className="checkout-form-row">
-              <div style={{flex:1}}>
-                <label style={{display:'block', marginBottom:'0.5rem', fontSize:'0.9rem', fontWeight:600}}>Full Name *</label>
+              <div style={{ flex: 1 }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "0.5rem",
+                    fontSize: "0.9rem",
+                    fontWeight: 600,
+                  }}
+                >
+                  Full Name *
+                </label>
                 <input
                   type="text"
                   placeholder="John Doe"
                   className="form-input"
-                  style={{width:'100%', padding:'0.75rem', borderRadius:'var(--radius-sm)', border:errors.fullName?'1px solid var(--error)':'1px solid var(--border)', background:'var(--bg-elevated)', color:'var(--text)'}}
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    borderRadius: "var(--radius-sm)",
+                    border: errors.fullName
+                      ? "1px solid var(--error)"
+                      : "1px solid var(--border)",
+                    background: "var(--bg-elevated)",
+                    color: "var(--text)",
+                  }}
                   value={form.fullName}
                   onChange={handleChange("fullName")}
                 />
-                {errors.fullName && <span style={{color:'var(--error)', fontSize:'0.8rem', marginTop:'0.25rem', display:'block'}}>{errors.fullName}</span>}
+                {errors.fullName && (
+                  <span
+                    style={{
+                      color: "var(--error)",
+                      fontSize: "0.8rem",
+                      marginTop: "0.25rem",
+                      display: "block",
+                    }}
+                  >
+                    {errors.fullName}
+                  </span>
+                )}
               </div>
 
-              <div style={{flex:1}}>
-                <label style={{display:'block', marginBottom:'0.5rem', fontSize:'0.9rem', fontWeight:600}}>Phone Number *</label>
+              <div style={{ flex: 1 }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "0.5rem",
+                    fontSize: "0.9rem",
+                    fontWeight: 600,
+                  }}
+                >
+                  Phone Number *
+                </label>
                 <input
                   type="tel"
                   placeholder="01XXXXXXXXX"
                   className="form-input"
-                  style={{width:'100%', padding:'0.75rem', borderRadius:'var(--radius-sm)', border:errors.phone?'1px solid var(--error)':'1px solid var(--border)', background:'var(--bg-elevated)', color:'var(--text)'}}
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    borderRadius: "var(--radius-sm)",
+                    border: errors.phone
+                      ? "1px solid var(--error)"
+                      : "1px solid var(--border)",
+                    background: "var(--bg-elevated)",
+                    color: "var(--text)",
+                  }}
                   value={form.phone}
                   onChange={handleChange("phone")}
                 />
-                {errors.phone && <span style={{color:'var(--error)', fontSize:'0.8rem', marginTop:'0.25rem', display:'block'}}>{errors.phone}</span>}
+                {errors.phone && (
+                  <span
+                    style={{
+                      color: "var(--error)",
+                      fontSize: "0.8rem",
+                      marginTop: "0.25rem",
+                      display: "block",
+                    }}
+                  >
+                    {errors.phone}
+                  </span>
+                )}
               </div>
             </div>
 
-            <div style={{marginBottom:'1.5rem'}}>
-              <label style={{display:'block', marginBottom:'0.5rem', fontSize:'0.9rem', fontWeight:600}}>Governorate *</label>
-              <select 
+            <div style={{ marginBottom: "1.5rem" }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "0.5rem",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                }}
+              >
+                Governorate *
+              </label>
+              <select
                 className="form-input"
-                style={{width:'100%', padding:'0.75rem', borderRadius:'var(--radius-sm)', border:errors.governorate?'1px solid var(--error)':'1px solid var(--border)', background:'var(--bg-elevated)', color:'var(--text)'}}
-                value={form.governorate} 
+                style={{
+                  width: "100%",
+                  padding: "0.75rem",
+                  borderRadius: "var(--radius-sm)",
+                  border: errors.governorate
+                    ? "1px solid var(--error)"
+                    : "1px solid var(--border)",
+                  background: "var(--bg-elevated)",
+                  color: "var(--text)",
+                }}
+                value={form.governorate}
                 onChange={handleChange("governorate")}
               >
                 <option value="">Select governorate</option>
                 {GOVERNORATES.map((g, i) => (
-                  <option key={i} value={g}>{g}</option>
+                  <option key={i} value={g}>
+                    {g}
+                  </option>
                 ))}
               </select>
-              {errors.governorate && <span style={{color:'var(--error)', fontSize:'0.8rem', marginTop:'0.25rem', display:'block'}}>{errors.governorate}</span>}
+              {errors.governorate && (
+                <span
+                  style={{
+                    color: "var(--error)",
+                    fontSize: "0.8rem",
+                    marginTop: "0.25rem",
+                    display: "block",
+                  }}
+                >
+                  {errors.governorate}
+                </span>
+              )}
             </div>
 
-            <div style={{marginBottom:'1rem'}}>
-              <label style={{display:'block', marginBottom:'0.5rem', fontSize:'0.9rem', fontWeight:600}}>Detailed Address *</label>
+            <div style={{ marginBottom: "1rem" }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "0.5rem",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                }}
+              >
+                Detailed Address *
+              </label>
               <textarea
                 rows={3}
                 className="form-input"
-                style={{width:'100%', padding:'0.75rem', borderRadius:'var(--radius-sm)', border:errors.address?'1px solid var(--error)':'1px solid var(--border)', background:'var(--bg-elevated)', color:'var(--text)', resize:'vertical'}}
+                style={{
+                  width: "100%",
+                  padding: "0.75rem",
+                  borderRadius: "var(--radius-sm)",
+                  border: errors.address
+                    ? "1px solid var(--error)"
+                    : "1px solid var(--border)",
+                  background: "var(--bg-elevated)",
+                  color: "var(--text)",
+                  resize: "vertical",
+                }}
                 placeholder="Street, building, apartment, landmark…"
                 value={form.address}
                 onChange={handleChange("address")}
               />
-              {errors.address && <span style={{color:'var(--error)', fontSize:'0.8rem', marginTop:'0.25rem', display:'block'}}>{errors.address}</span>}
+              {errors.address && (
+                <span
+                  style={{
+                    color: "var(--error)",
+                    fontSize: "0.8rem",
+                    marginTop: "0.25rem",
+                    display: "block",
+                  }}
+                >
+                  {errors.address}
+                </span>
+              )}
             </div>
           </section>
 
           {/* Payment Method */}
-          <section className="form-section" style={{marginBottom:'2.5rem'}}>
-            <h3 className="form-section-title" style={{fontSize:'1.25rem', fontWeight:800, marginBottom:'1.5rem', paddingBottom:'0.5rem', borderBottom:'1px solid var(--border)'}}>
+          <section className="form-section" style={{ marginBottom: "2.5rem" }}>
+            <h3
+              className="form-section-title"
+              style={{
+                fontSize: "1.25rem",
+                fontWeight: 800,
+                marginBottom: "1.5rem",
+                paddingBottom: "0.5rem",
+                borderBottom: "1px solid var(--border)",
+              }}
+            >
               Payment Method
             </h3>
 
-            <div className="payment-options" style={{display:'flex', flexDirection:'column', gap:'1rem', marginBottom:'1.5rem'}}>
-              <label style={{display:'flex', alignItems:'center', gap:'0.75rem', padding:'1.25rem', background:'var(--bg-elevated)', borderRadius:'var(--radius-sm)', border:paymentMethod === 'cash' ? '2px solid var(--accent)' : '1px solid var(--border)', cursor:'pointer'}}>
+            <div
+              className="payment-options"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "1rem",
+                marginBottom: "1.5rem",
+              }}
+            >
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.75rem",
+                  padding: "1.25rem",
+                  background: "var(--bg-elevated)",
+                  borderRadius: "var(--radius-sm)",
+                  border:
+                    paymentMethod === "cash"
+                      ? "2px solid var(--accent)"
+                      : "1px solid var(--border)",
+                  cursor: "pointer",
+                }}
+              >
                 <input
                   type="radio"
                   name="payment"
                   value="cash"
-                  style={{accentColor:'var(--accent)', margin: 0, width:'18px', height:'18px'}}
+                  style={{
+                    accentColor: "var(--accent)",
+                    margin: 0,
+                    width: "18px",
+                    height: "18px",
+                  }}
                   checked={paymentMethod === "cash"}
                   onChange={() => setPaymentMethod("cash")}
                 />
-                <span style={{fontWeight:600}}>Cash on Delivery</span>
+                <span style={{ fontWeight: 600 }}>Cash on Delivery</span>
               </label>
 
-              <label style={{display:'flex', alignItems:'center', gap:'0.75rem', padding:'1.25rem', background:'var(--bg-elevated)', borderRadius:'var(--radius-sm)', border:paymentMethod === 'vodafone' ? '2px solid var(--accent)' : '1px solid var(--border)', cursor:'pointer'}}>
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.75rem",
+                  padding: "1.25rem",
+                  background: "var(--bg-elevated)",
+                  borderRadius: "var(--radius-sm)",
+                  border:
+                    paymentMethod === "vodafone"
+                      ? "2px solid var(--accent)"
+                      : "1px solid var(--border)",
+                  cursor: "pointer",
+                }}
+              >
                 <input
                   type="radio"
                   name="payment"
                   value="vodafone"
-                  style={{accentColor:'var(--accent)', margin: 0, width:'18px', height:'18px'}}
+                  style={{
+                    accentColor: "var(--accent)",
+                    margin: 0,
+                    width: "18px",
+                    height: "18px",
+                  }}
                   checked={paymentMethod === "vodafone"}
                   onChange={() => {
                     setPaymentMethod("vodafone");
                     setHasCopiedVodafone(false);
                   }}
                 />
-                <span style={{fontWeight:600}}>Vodafone Cash</span>
+                <span style={{ fontWeight: 600 }}>Vodafone Cash</span>
               </label>
             </div>
 
             {/* Vodafone Cash instructions */}
             {paymentMethod === "vodafone" && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding:'1.25rem', background:'rgba(230, 0, 0, 0.1)', borderRadius:'var(--radius-sm)', color:'var(--text)' }}>
-                <p style={{lineHeight:1.6, fontSize:'0.9rem', margin: 0}} dir="rtl">
-                  يرجى تحويل المبلغ الإجمالي إلى رقم فودافون كاش التالي: <strong>01070831335</strong>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
+                  padding: "1.25rem",
+                  background: "rgba(230, 0, 0, 0.1)",
+                  borderRadius: "var(--radius-sm)",
+                  color: "var(--text)",
+                }}
+              >
+                <p
+                  style={{ lineHeight: 1.6, fontSize: "0.9rem", margin: 0 }}
+                  dir="rtl"
+                >
+                  يرجى تحويل المبلغ الإجمالي إلى رقم فودافون كاش التالي:{" "}
+                  <strong>01070831335</strong>
                   <br />
-                  ثم النقر على "الاستمرار للدفع" وتأكيد الطلب عبر واتساب مع إرسال لقطة شاشة لعملية التحويل.
+                  ثم النقر على "الاستمرار للدفع" وتأكيد الطلب عبر واتساب مع
+                  إرسال لقطة شاشة لعملية التحويل.
                 </p>
                 <button
                   type="button"
@@ -341,7 +609,7 @@ export default function Checkout() {
                     alignItems: "center",
                     justifyContent: "center",
                     gap: "0.5rem",
-                    alignSelf:'flex-start'
+                    alignSelf: "flex-start",
                   }}
                 >
                   {hasCopiedVodafone ? "Number Copied! ✓" : "Copy Number"}
@@ -350,24 +618,47 @@ export default function Checkout() {
             )}
           </section>
 
-          <div style={{background:'rgba(255,255,255,0.05)', padding:'1rem', borderRadius:'8px', marginBottom:'1.5rem', fontSize:'0.9rem', lineHeight:1.5}} dir="rtl">
-            <strong style={{display:'block', marginBottom:'0.5rem', color:'var(--accent)'}}>ملاحظة هامة:</strong>
-            بعد النقر على استكمال الدفع، سيتم توجيهك إلى واتساب. يجب النقر على إرسال لتأكيد الطلب وإرسال سكرين شوت الدفع إن وجد.
+          <div
+            style={{
+              background: "rgba(255,255,255,0.05)",
+              padding: "1rem",
+              borderRadius: "8px",
+              marginBottom: "1.5rem",
+              fontSize: "0.9rem",
+              lineHeight: 1.5,
+            }}
+            dir="rtl"
+          >
+            <strong
+              style={{
+                display: "block",
+                marginBottom: "0.5rem",
+                color: "var(--accent)",
+              }}
+            >
+              ملاحظة هامة:
+            </strong>
+            بعد النقر على استكمال الدفع، سيتم توجيهك إلى واتساب. يجب النقر على
+            إرسال لتأكيد الطلب وإرسال سكرين شوت الدفع إن وجد.
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn btn-primary btn-lg"
             disabled={paymentMethod === "vodafone" && !hasCopiedVodafone}
-            style={{ 
-              opacity: (paymentMethod === "vodafone" && !hasCopiedVodafone) ? 0.5 : 1, 
-              cursor: (paymentMethod === "vodafone" && !hasCopiedVodafone) ? "not-allowed" : "pointer",
+            style={{
+              opacity:
+                paymentMethod === "vodafone" && !hasCopiedVodafone ? 0.5 : 1,
+              cursor:
+                paymentMethod === "vodafone" && !hasCopiedVodafone
+                  ? "not-allowed"
+                  : "pointer",
               transition: "all 0.3s ease",
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem'
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.5rem",
             }}
           >
             Continue to Payment
@@ -375,28 +666,112 @@ export default function Checkout() {
         </form>
 
         {/* ── RIGHT COLUMN: Order Summary ── */}
-        <aside className="checkout-summary" style={{background:'var(--bg-elevated)', padding:'2rem', border:'1px solid var(--border)', borderRadius:'var(--radius)'}}>
-          <h3 style={{fontSize:'1.25rem', fontWeight:800, marginBottom:'1.5rem'}}>Your Cart</h3>
+        <aside
+          className="checkout-summary"
+          style={{
+            background: "var(--bg-elevated)",
+            padding: "2rem",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--radius)",
+          }}
+        >
+          <h3
+            style={{
+              fontSize: "1.25rem",
+              fontWeight: 800,
+              marginBottom: "1.5rem",
+            }}
+          >
+            Your Cart
+          </h3>
 
-          <div style={{display:'flex', flexDirection:'column', gap:'1.25rem', marginBottom:'2rem'}}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1.25rem",
+              marginBottom: "2rem",
+            }}
+          >
             {items.map((item) => (
-              <div key={`${item.product._id}-${item.size}`} style={{display:'flex', gap:'1rem'}}>
-                <div style={{position:'relative', width:'70px', height:'85px', borderRadius:'6px', overflow:'hidden', flexShrink:0}}>
-                  <img src={item.product.images?.[0]} alt={item.product.name} style={{width:'100%', height:'100%', objectFit:'cover'}} loading="lazy" />
-                  <span style={{position:'absolute', top:'-5px', right:'-5px', background:'var(--accent)', color:'#fff', fontSize:'11px', width:'30px', height:'30px', display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'50%', fontWeight:'bold'}}>{item.qty}</span>
+              <div
+                key={`${item.product._id}-${item.size}`}
+                style={{ display: "flex", gap: "1rem" }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    width: "70px",
+                    height: "85px",
+                    borderRadius: "6px",
+                    overflow: "hidden",
+                    flexShrink: 0,
+                  }}
+                >
+                  <img
+                    src={item.product.images?.[0]}
+                    alt={item.product.name}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                    loading="lazy"
+                  />
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: "-5px",
+                      right: "-5px",
+                      background: "var(--accent)",
+                      color: "#fff",
+                      fontSize: "11px",
+                      width: "30px",
+                      height: "30px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: "50%",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {item.qty}
+                  </span>
                 </div>
-                <div style={{flex:1}}>
-                  <p style={{fontWeight:700, fontSize:'0.95rem', margin:'0 0 0.25rem 0'}}>{item.product.name}</p>
-                  <p style={{fontSize:'0.85rem', color:'var(--text-muted)', margin:0}}>Size: {item.size}</p>
+                <div style={{ flex: 1 }}>
+                  <p
+                    style={{
+                      fontWeight: 700,
+                      fontSize: "0.95rem",
+                      margin: "0 0 0.25rem 0",
+                    }}
+                  >
+                    {item.product.name}
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "0.85rem",
+                      color: "var(--text-muted)",
+                      margin: 0,
+                    }}
+                  >
+                    Size: {item.size}
+                  </p>
                 </div>
-                <span style={{fontWeight:700, fontSize:'0.95rem'}}>
+                <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>
                   LE {(item.product.price * item.qty).toFixed(2)}
                 </span>
               </div>
             ))}
           </div>
 
-          <div style={{height:'1px', background:'var(--border)', margin:'1.5rem 0'}} />
+          <div
+            style={{
+              height: "1px",
+              background: "var(--border)",
+              margin: "1.5rem 0",
+            }}
+          />
 
           {/* Discount Code Section */}
           <div style={{ marginBottom: "1.5rem" }}>
@@ -414,13 +789,15 @@ export default function Checkout() {
                   borderRadius: "var(--radius-sm)",
                   border: "1px solid var(--border)",
                   background: "var(--bg-elevated)",
-                  color: "var(--text)"
+                  color: "var(--text)",
                 }}
               />
               <button
                 type="button"
                 onClick={appliedDiscount ? removeDiscount : handleApplyDiscount}
-                disabled={(!discountCode.trim() && !appliedDiscount) || isApplying}
+                disabled={
+                  (!discountCode.trim() && !appliedDiscount) || isApplying
+                }
                 className="btn btn-primary"
                 style={{
                   padding: "0.75rem 1.25rem",
@@ -429,75 +806,157 @@ export default function Checkout() {
                   color: appliedDiscount ? "#fff" : "var(--bg)",
                   border: "none",
                   fontWeight: "bold",
-                  cursor: ((!discountCode.trim() && !appliedDiscount) || isApplying) ? "not-allowed" : "pointer",
-                  opacity: ((!discountCode.trim() && !appliedDiscount) || isApplying) ? 0.7 : 1,
+                  cursor:
+                    (!discountCode.trim() && !appliedDiscount) || isApplying
+                      ? "not-allowed"
+                      : "pointer",
+                  opacity:
+                    (!discountCode.trim() && !appliedDiscount) || isApplying
+                      ? 0.7
+                      : 1,
                 }}
               >
                 {isApplying ? "..." : appliedDiscount ? "Remove" : "Apply"}
               </button>
             </div>
-            {discountError && <span style={{ color: "var(--error)", fontSize: "0.8rem", marginTop: "0.5rem", display: "block" }}>{discountError}</span>}
-            {appliedDiscount && <span style={{ color: "var(--success)", fontSize: "0.8rem", marginTop: "0.5rem", display: "block" }}>{appliedDiscount.code} applied (-{appliedDiscount.discountPercent}%)</span>}
-          </div>
-
-          <div style={{display:'flex', justifyContent:'space-between', marginBottom:'1rem', fontSize:'0.95rem'}}>
-            <span style={{color:'var(--text-muted)'}}>Subtotal</span>
-            <span style={{fontWeight:600}}>LE {total.toFixed(2)}</span>
-          </div>
-
-          {appliedDiscount && (
-            <div style={{display:'flex', justifyContent:'space-between', marginBottom:'1rem', fontSize:'0.95rem', color: 'var(--success)'}}>
-              <span>Discount</span>
-              <span style={{fontWeight:600}}>-LE {discountValue.toFixed(2)}</span>
-            </div>
-          )}
-
-          <div style={{display:'flex', justifyContent:'space-between', marginBottom:'1.5rem', fontSize:'0.95rem'}}>
-            <span style={{color:'var(--text-muted)'}}>Shipping</span>
-            {deliveryFee === 0 && !form.governorate ? (
-              <span style={{ color: "#999", fontSize:'0.85rem' }}>Select Gov</span>
-            ) : deliveryFee === 0 ? (
-              <span style={{color:'var(--success)', fontWeight:'bold'}}>Free</span>
-            ) : (
-              <span style={{fontWeight:600}}>LE {deliveryFee.toFixed(2)}</span>
+            {discountError && (
+              <span
+                style={{
+                  color: "var(--error)",
+                  fontSize: "0.8rem",
+                  marginTop: "0.5rem",
+                  display: "block",
+                }}
+              >
+                {discountError}
+              </span>
+            )}
+            {appliedDiscount && (
+              <span
+                style={{
+                  color: "var(--success)",
+                  fontSize: "0.8rem",
+                  marginTop: "0.5rem",
+                  display: "block",
+                }}
+              >
+                {appliedDiscount.code} applied (-
+                {appliedDiscount.discountPercent}%)
+              </span>
             )}
           </div>
 
-          <div style={{height:'1px', background:'var(--border)', margin:'1.5rem 0'}} />
-
-          <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:'1.2rem', fontWeight:800, marginBottom:'2rem'}}>
-            <span>Total</span>
-            <span style={{color:'var(--accent)'}}>LE {finalTotal.toFixed(2)}</span>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "1rem",
+              fontSize: "0.95rem",
+            }}
+          >
+            <span style={{ color: "var(--text-muted)" }}>Subtotal</span>
+            <span style={{ fontWeight: 600 }}>LE {total.toFixed(2)}</span>
           </div>
 
+          {appliedDiscount && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "1rem",
+                fontSize: "0.95rem",
+                color: "var(--success)",
+              }}
+            >
+              <span>Discount</span>
+              <span style={{ fontWeight: 600 }}>
+                -LE {discountValue.toFixed(2)}
+              </span>
+            </div>
+          )}
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "1.5rem",
+              fontSize: "0.95rem",
+            }}
+          >
+            <span style={{ color: "var(--text-muted)" }}>Shipping</span>
+            {deliveryFee === 0 && !form.governorate ? (
+              <span style={{ color: "#999", fontSize: "0.85rem" }}>
+                Select Gov
+              </span>
+            ) : deliveryFee === 0 ? (
+              <span style={{ color: "var(--success)", fontWeight: "bold" }}>
+                Free
+              </span>
+            ) : (
+              <span style={{ fontWeight: 600 }}>
+                LE {deliveryFee.toFixed(2)}
+              </span>
+            )}
+          </div>
+
+          <div
+            style={{
+              height: "1px",
+              background: "var(--border)",
+              margin: "1.5rem 0",
+            }}
+          />
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontSize: "1.2rem",
+              fontWeight: 800,
+              marginBottom: "2rem",
+            }}
+          >
+            <span>Total</span>
+            <span style={{ color: "var(--accent)" }}>
+              LE {finalTotal.toFixed(2)}
+            </span>
+          </div>
         </aside>
       </div>
 
       {showReturnPolicy && (
-        <div style={{
-          position: "fixed",
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: "rgba(0,0,0,0.7)",
-          zIndex: 9999,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "1rem"
-        }}>
-          <div style={{
-            background: "var(--bg-elevated)",
-            border: "1px solid var(--border)",
-            borderRadius: "16px",
-            padding: "2rem",
-            maxWidth: "500px",
-            width: "100%",
-            position: "relative",
-            direction: "rtl",
-            textAlign: "right",
-            boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
-          }}>
-            <button 
-              type="button" 
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.7)",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1rem",
+          }}
+        >
+          <div
+            style={{
+              background: "var(--bg-elevated)",
+              border: "1px solid var(--border)",
+              borderRadius: "16px",
+              padding: "2rem",
+              maxWidth: "500px",
+              width: "100%",
+              position: "relative",
+              direction: "rtl",
+              textAlign: "right",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+            }}
+          >
+            <button
+              type="button"
               onClick={() => setShowReturnPolicy(false)}
               style={{
                 position: "absolute",
@@ -507,29 +966,65 @@ export default function Checkout() {
                 border: "none",
                 color: "var(--text-muted)",
                 fontSize: "1.25rem",
-                cursor: "pointer"
+                cursor: "pointer",
               }}
             >
               ✕
             </button>
-            <h3 style={{ color: "var(--accent)", marginTop: 0, marginBottom: "1rem", fontSize: "1.2rem" }}>سياسة الاسترجاع والاستبدال</h3>
-            <div style={{ fontSize: "0.9rem", lineHeight: "1.6", color: "var(--text)" }}>
-              <p style={{ marginBottom: "0.75rem" }}><strong>عميلنا العزيز،</strong> حرصاً منا على سلامتك العامة وطبقاً للاشتراطات الصحية المتبعة عالمياً وفي قانون حماية المستهلك المصري:</p>
-              
+            <h3
+              style={{
+                color: "var(--accent)",
+                marginTop: 0,
+                marginBottom: "1rem",
+                fontSize: "1.2rem",
+              }}
+            >
+              سياسة الاسترجاع والاستبدال
+            </h3>
+            <div
+              style={{
+                fontSize: "0.9rem",
+                lineHeight: "1.6",
+                color: "var(--text)",
+              }}
+            >
               <p style={{ marginBottom: "0.75rem" }}>
-                <strong style={{ color: "#ff4d4f" }}>المنتجات الشخصية:</strong> نعتذر عن استبدال أو استرجاع أي من قطع الملابس الداخلية (البوكسرات، الفانلات، الملابس الداخلية الحريمي) بمجرد استلامها وفتح الغلاف الخاص بها، وذلك لضمان أعلى معايير النظافة والصحة العامة لجميع عملائنا.
+                <strong>عميلنا العزيز،</strong> حرصاً منا على سلامتك العامة
+                وطبقاً للاشتراطات الصحية المتبعة عالمياً وفي قانون حماية
+                المستهلك المصري:
               </p>
-              
+
               <p style={{ marginBottom: "0.75rem" }}>
-                <strong style={{ color: "var(--accent)" }}>المعاينة عند الاستلام:</strong> يرجى التأكد من المقاس والنوع والعدد فور وصول المندوب وقبل فتح الغلاف الداخلي للمنتج. في حالة وجود أي اختلاف أو رغبة في التراجع، يمكنكم رفض الاستلام مع دفع مصاريف الشحن فقط.
+                <strong style={{ color: "#ff4d4f" }}>المنتجات الشخصية:</strong>{" "}
+                نعتذر عن استبدال أو استرجاع أي من قطع الملابس الداخلية
+                (البوكسرات، الفانلات، الملابس الداخلية الحريمي) بمجرد استلامها
+                وفتح الغلاف الخاص بها، وذلك لضمان أعلى معايير النظافة والصحة
+                العامة لجميع عملائنا.
               </p>
-              
+
               <p style={{ marginBottom: "0.75rem" }}>
-                <strong style={{ color: "var(--accent)" }}>عيوب الصناعة:</strong> في حالة وجود عيب صناعة واضح في المنتج، يتم التواصل معنا خلال 24 ساعة من الاستلام، وسنقوم باستبدال المنتج مجاناً دون تحملكم أي تكاليف إضافية (بشرط عدم استخدام المنتج).
+                <strong style={{ color: "var(--accent)" }}>
+                  المعاينة عند الاستلام:
+                </strong>{" "}
+                يرجى التأكد من المقاس والنوع والعدد فور وصول المندوب وقبل فتح
+                الغلاف الداخلي للمنتج. في حالة وجود أي اختلاف أو رغبة في
+                التراجع، يمكنكم رفض الاستلام مع دفع مصاريف الشحن فقط.
               </p>
-              
+
+              <p style={{ marginBottom: "0.75rem" }}>
+                <strong style={{ color: "var(--accent)" }}>
+                  عيوب الصناعة:
+                </strong>{" "}
+                في حالة وجود عيب صناعة واضح في المنتج، يتم التواصل معنا خلال 24
+                ساعة من الاستلام، وسنقوم باستبدال المنتج مجاناً دون تحملكم أي
+                تكاليف إضافية (بشرط عدم استخدام المنتج).
+              </p>
+
               <p style={{ margin: 0 }}>
-                <strong style={{ color: "var(--accent)" }}>المقاسات:</strong> يرجى مراجعة "جدول المقاسات" الموضح في صفحة كل منتج بعناية قبل الطلب، حيث أن اختيار المقاس الخاطئ لا يمنح الحق في الاسترجاع بعد فتح المنتج.
+                <strong style={{ color: "var(--accent)" }}>المقاسات:</strong>{" "}
+                يرجى مراجعة "جدول المقاسات" الموضح في صفحة كل منتج بعناية قبل
+                الطلب، حيث أن اختيار المقاس الخاطئ لا يمنح الحق في الاسترجاع بعد
+                فتح المنتج.
               </p>
             </div>
           </div>
