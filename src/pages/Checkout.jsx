@@ -584,18 +584,16 @@ export default function Checkout() {
                   style={{ lineHeight: 1.6, fontSize: "0.9rem", margin: 0 }}
                   dir="rtl"
                 >
-                  يرجى تحويل المبلغ الإجمالي إلى رقم فودافون كاش التالي:{" "}
-                  <strong>01070831335</strong>
+                  يرجى الضغط على الزر أدناه للدفع عبر فودافون كاش.
                   <br />
-                  ثم النقر على "الاستمرار للدفع" وتأكيد الطلب عبر واتساب مع
-                  إرسال لقطة شاشة لعملية التحويل.
+                  <strong>مهم:</strong> يجب التقاط لقطة شاشة (سكرين شوت) للتحويل
+                  وإرسالها على الواتساب مع الطلب لتأكيد الدفع.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText("01070831335");
-                    setHasCopiedVodafone(true);
-                  }}
+                <a
+                  href="http://vf.eg/vfcash?id=mt&qrId=9CVxWq"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setHasCopiedVodafone(true)}
                   style={{
                     backgroundColor: "#e60000",
                     color: "#fff",
@@ -610,10 +608,13 @@ export default function Checkout() {
                     justifyContent: "center",
                     gap: "0.5rem",
                     alignSelf: "flex-start",
+                    textDecoration: "none",
                   }}
                 >
-                  {hasCopiedVodafone ? "Number Copied! ✓" : "Copy Number"}
-                </button>
+                  {hasCopiedVodafone
+                    ? "تم فتح الرابط ✓"
+                    : "الدفع عبر فودافون كاش"}
+                </a>
               </div>
             )}
           </section>
