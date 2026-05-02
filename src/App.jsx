@@ -20,6 +20,7 @@ import AdminProducts from './pages/admin/AdminProducts.jsx';
 import AdminOrders from './pages/admin/AdminOrders.jsx';
 import AdminCategories from './pages/admin/AdminCategories.jsx';
 import AdminDiscounts from './pages/admin/AdminDiscounts.jsx';
+import AdminDelivery from './pages/admin/AdminDelivery.jsx';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
             <Route path="/admin/orders" element={<ProtectedRoute><AdminOrders /></ProtectedRoute>} />
             <Route path="/admin/categories" element={<ProtectedRoute><AdminCategories /></ProtectedRoute>} />
             <Route path="/admin/discounts" element={<ProtectedRoute><AdminDiscounts /></ProtectedRoute>} />
+            <Route path="/admin/delivery" element={<ProtectedRoute><AdminDelivery /></ProtectedRoute>} />
           </Routes>
         </main>
         <Footer />

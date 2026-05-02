@@ -45,6 +45,11 @@ const OrderSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+const DeliveryFeeSchema = new mongoose.Schema({
+  governorate: { type: String, required: true, unique: true },
+  fee: { type: Number, required: true, default: 100 }
+});
+
 export async function connectDB() {
   if (isConnected) return;
   await mongoose.connect(process.env.MONGODB_URI);
@@ -53,3 +58,4 @@ export async function connectDB() {
 
 export const Product = mongoose.models.Product || mongoose.model('Product', ProductSchema);
 export const Order = mongoose.models.Order || mongoose.model('Order', OrderSchema);
+export const DeliveryFee = mongoose.models.DeliveryFee || mongoose.model('DeliveryFee', DeliveryFeeSchema);

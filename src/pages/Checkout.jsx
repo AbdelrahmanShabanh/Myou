@@ -36,30 +36,30 @@ const GOVERNORATES = [
 const GOV_FEES = {
   Cairo: 100,
   Giza: 100,
-  Alexandria: 105,
+  Alexandria: 100,
   Dakahlia: 100,
   Beheira: 100,
   Gharbia: 100,
   Menofia: 100,
   Qalyubia: 100,
-  Damietta: 110,
+  Damietta: 100,
   Sharqia: 100,
-  Ismailia: 110,
+  Ismailia: 100,
   Suez: 100,
-  "Port Said": 60,
-  Fayoum: 110,
-  "Beni Suef": 110,
-  Minya: 110,
-  Assiut: 110,
-  Sohag: 110,
-  Qena: 110,
-  Luxor: 110,
-  Aswan: 110,
-  "Red Sea": 110,
-  "New Valley": 110,
-  "North Sinai": 110,
-  "South Sinai": 110,
-  Matrouh: 110,
+  "Port Said": 100,
+  Fayoum: 100,
+  "Beni Suef": 100,
+  Minya: 100,
+  Assiut: 100,
+  Sohag: 100,
+  Qena: 100,
+  Luxor: 100,
+  Aswan: 100,
+  "Red Sea": 100,
+  "New Valley": 100,
+  "North Sinai": 100,
+  "South Sinai": 100,
+  Matrouh: 100,
 };
 
 export default function Checkout() {
@@ -96,6 +96,23 @@ export default function Checkout() {
     if (items.length === 0 && !submitted) navigate("/cart", { replace: true });
   }, [items, navigate, submitted]);
 
+  const [dbFees, setDbFees] = useState({});
+
+  useEffect(() => {
+    fetch("/api/delivery_fees")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const feesMap = {};
+          data.forEach(item => {
+            feesMap[item.governorate] = item.fee;
+          });
+          setDbFees(feesMap);
+        }
+      })
+      .catch(err => console.error("Failed to load DB fees", err));
+  }, []);
+
   if (items.length === 0 && !submitted) return null;
 
   const total = cartTotal;
@@ -103,11 +120,9 @@ export default function Checkout() {
     ? total * (appliedDiscount.discountPercent / 100)
     : 0;
   const totalAfterDiscount = total - discountValue;
-  const deliveryFee = form.governorate ? GOV_FEES[form.governorate] || 110 : 0;
-  const finalTotal = totalAfterDiscount + deliveryFee;
-
-  const handleApplyDiscount = async () => {
-    if (!discountCode.trim()) return;
+    const deliveryFee = form.governorate 
+      ? (dbFees[form.governorate] !== undefined ? dbFees[form.governorate] : 100) 
+      : 0;
     setIsApplying(true);
     setDiscountError("");
     try {
