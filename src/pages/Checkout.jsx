@@ -100,17 +100,17 @@ export default function Checkout() {
 
   useEffect(() => {
     fetch("/api/delivery_fees")
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (Array.isArray(data)) {
           const feesMap = {};
-          data.forEach(item => {
+          data.forEach((item) => {
             feesMap[item.governorate] = item.fee;
           });
           setDbFees(feesMap);
         }
       })
-      .catch(err => console.error("Failed to load DB fees", err));
+      .catch((err) => console.error("Failed to load DB fees", err));
   }, []);
 
   if (items.length === 0 && !submitted) return null;
@@ -120,8 +120,10 @@ export default function Checkout() {
     ? total * (appliedDiscount.discountPercent / 100)
     : 0;
   const totalAfterDiscount = total - discountValue;
-  const deliveryFee = form.governorate 
-    ? (dbFees[form.governorate] !== undefined ? dbFees[form.governorate] : 100) 
+  const deliveryFee = form.governorate
+    ? dbFees[form.governorate] !== undefined
+      ? dbFees[form.governorate]
+      : 100
     : 0;
   const finalTotal = totalAfterDiscount + deliveryFee;
 
