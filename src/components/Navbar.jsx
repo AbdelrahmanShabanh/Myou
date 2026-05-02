@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
+import { useLanguage } from "../context/LanguageContext.jsx";
 
 export default function Navbar() {
   const { cartCount, toggleCart } = useCart();
+  const { lang, toggleLanguage, t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
   const [openMobileCats, setOpenMobileCats] = useState({});
   const [scrolled, setScrolled] = useState(false);

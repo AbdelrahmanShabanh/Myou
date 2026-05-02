@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { CartProvider } from "./context/CartContext.jsx";
-import ScrollToTop from "./components/ScrollToTop.jsx";
+import { CartProvider } from "./context/CartContext.jsx";import { LanguageProvider } from './context/LanguageContext.jsx';import ScrollToTop from "./components/ScrollToTop.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import ChatWidget from "./components/ChatWidget.jsx";
@@ -24,11 +23,12 @@ import AdminDelivery from "./pages/admin/AdminDelivery.jsx";
 
 function App() {
   return (
-    <CartProvider>
-      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <ScrollToTop />
-        <Navbar />
-        <CartDrawer />
+    <LanguageProvider>
+      <CartProvider>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <ScrollToTop />
+          <Navbar />
+          <CartDrawer />
         <main>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -93,6 +93,7 @@ function App() {
         <ChatWidget />
       </Router>
     </CartProvider>
+    </LanguageProvider>
   );
 }
 

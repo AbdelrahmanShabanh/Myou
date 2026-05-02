@@ -1,34 +1,34 @@
 import { useState, useEffect } from "react";
 import AdminSidebar from "../../components/AdminSidebar.jsx";
 
-const DEFAULT_GOVERNORATES = [
-  "Cairo",
-  "Giza",
-  "Alexandria",
-  "Dakahlia",
-  "Red Sea",
-  "Beheira",
-  "Fayoum",
-  "Gharbia",
-  "Ismailia",
-  "Menofia",
-  "Minya",
-  "Qalyubia",
-  "New Valley",
-  "North Sinai",
-  "Port Said",
-  "Damietta",
-  "Sharqia",
-  "South Sinai",
-  "Suez",
-  "Luxor",
-  "Matrouh",
-  "Qena",
-  "Sohag",
-  "Aswan",
-  "Assiut",
-  "Beni Suef",
-];
+  const DEFAULT_GOVERNORATES = [
+    "Cairo",
+    "Giza",
+    "Alexandria",
+    "Dakahlia",
+    "Red Sea",
+    "Beheira",
+    "Fayoum",
+    "Gharbia",
+    "Ismailia",
+    "Menofia",
+    "Minya",
+    "Qalyubia",
+    "New Valley",
+    "North Sinai",
+    "Port Said",
+    "Damietta",
+    "Sharqia",
+    "South Sinai",
+    "Suez",
+    "Luxor",
+    "Matrouh",
+    "Qena",
+    "Sohag",
+    "Aswan",
+    "Assiut",
+    "Beni Suef",
+  ].sort();
 
 export default function AdminDelivery() {
   const [fees, setFees] = useState({});
@@ -168,6 +168,13 @@ export default function AdminDelivery() {
         }
         .fee-group {
           margin-bottom: 0;
+          display: flex;
+          flex-direction: column;
+        }
+        .fee-group label {
+          margin-bottom: 0.5rem;
+          font-weight: 600;
+          font-size: 0.95rem;
         }
         .header-actions {
           display: flex;
@@ -176,6 +183,7 @@ export default function AdminDelivery() {
         .input-group {
           display: flex;
           align-items: center;
+          width: 100%;
         }
         .input-addon {
           background: var(--bg);
@@ -188,6 +196,26 @@ export default function AdminDelivery() {
         }
         .input-group input {
           border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+          width: 100%;
+        }
+        
+        @media (max-width: 600px) {
+          .fees-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+          }
+          .header-actions {
+            flex-direction: column;
+            width: 100%;
+          }
+          .header-actions button {
+            width: 100%;
+          }
+          .admin-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+          }
         }
       `}</style>
     </div>
