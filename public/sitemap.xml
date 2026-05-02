@@ -28,10 +28,6 @@
     <priority>0.5</priority>
   </url>
 
-  <!-- Checkout -->
-  <url>
-    <loc>https://m-you.vercel.app/checkout</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.4</priority>
-  </url>
+ 
+ 
 </urlset>
