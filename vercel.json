@@ -27,6 +27,12 @@
           "value": "Content-Type, Authorization"
         }
       ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        { "key": "Content-Type", "value": "application/xml" }
+      ]
     }
   ]
 }
