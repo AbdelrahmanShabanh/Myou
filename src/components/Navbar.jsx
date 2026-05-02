@@ -123,7 +123,7 @@ export default function Navbar() {
 
         <div className="navbar-actions">
           <button className="lang-btn" onClick={toggleLanguage}>
-            {lang === 'en' ? 'عربي' : 'EN'}
+            {lang === "en" ? "عربي" : "EN"}
           </button>
           {!isAdmin && (
             <Link
