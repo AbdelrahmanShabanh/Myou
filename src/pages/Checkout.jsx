@@ -120,9 +120,12 @@ export default function Checkout() {
     ? total * (appliedDiscount.discountPercent / 100)
     : 0;
   const totalAfterDiscount = total - discountValue;
-    const deliveryFee = form.governorate 
-      ? (dbFees[form.governorate] !== undefined ? dbFees[form.governorate] : 100) 
-      : 0;
+  const deliveryFee = form.governorate 
+    ? (dbFees[form.governorate] !== undefined ? dbFees[form.governorate] : 100) 
+    : 0;
+  const finalTotal = totalAfterDiscount + deliveryFee;
+
+  const handleApplyDiscount = async () => {
     setIsApplying(true);
     setDiscountError("");
     try {
