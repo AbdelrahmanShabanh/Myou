@@ -158,8 +158,8 @@ export default function ProductDetail() {
           <div className="detail-section">
             <div className="section-head">
               <span className="section-label">Select Size</span>
-              <button 
-                className="size-guide-btn" 
+              <button
+                className="size-guide-btn"
                 onClick={() => setShowSizeChart(true)}
               >
                 Size Guide
@@ -251,12 +251,25 @@ export default function ProductDetail() {
       </div>
 
       {showSizeChart && (
-        <div className="size-chart-modal" onClick={() => setShowSizeChart(false)}>
-          <div className="size-chart-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-modal" onClick={() => setShowSizeChart(false)}>
+        <div
+          className="size-chart-modal"
+          onClick={() => setShowSizeChart(false)}
+        >
+          <div
+            className="size-chart-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="close-modal"
+              onClick={() => setShowSizeChart(false)}
+            >
               ✕
             </button>
-            <img src="/size-chart.jpg" alt="Size Chart" className="size-chart-img" />
+            <img
+              src="/size-chart.jpg"
+              alt="Size Chart"
+              className="size-chart-img"
+            />
           </div>
         </div>
       )}
