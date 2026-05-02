@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from "react";
 
 const translations = {
   en: {
@@ -158,24 +158,24 @@ const translations = {
     orderItems: "العناصر",
     orderTotal: "المجموع",
     orderDate: "التاريخ",
-  }
+  },
 };
 
 const LanguageContext = createContext();
 
 export function LanguageProvider({ children }) {
   const [lang, setLang] = useState(() => {
-    return localStorage.getItem('myou_lang') || 'en';
+    return localStorage.getItem("myou_lang") || "en";
   });
 
   useEffect(() => {
-    localStorage.setItem('myou_lang', lang);
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    localStorage.setItem("myou_lang", lang);
+    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
     document.documentElement.lang = lang;
   }, [lang]);
 
   const toggleLanguage = () => {
-    setLang(prev => prev === 'en' ? 'ar' : 'en');
+    setLang((prev) => (prev === "en" ? "ar" : "en"));
   };
 
   const t = (key) => {
