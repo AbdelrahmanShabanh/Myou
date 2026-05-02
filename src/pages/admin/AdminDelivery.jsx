@@ -2,10 +2,32 @@ import { useState, useEffect } from "react";
 import AdminSidebar from "../../components/AdminSidebar.jsx";
 
 const DEFAULT_GOVERNORATES = [
-  "Cairo", "Giza", "Alexandria", "Dakahlia", "Red Sea", "Beheira", "Fayoum", 
-  "Gharbia", "Ismailia", "Menofia", "Minya", "Qalyubia", "New Valley", 
-  "North Sinai", "Port Said", "Damietta", "Sharqia", "South Sinai", "Suez", 
-  "Luxor", "Matrouh", "Qena", "Sohag", "Aswan", "Assiut", "Beni Suef"
+  "Cairo",
+  "Giza",
+  "Alexandria",
+  "Dakahlia",
+  "Red Sea",
+  "Beheira",
+  "Fayoum",
+  "Gharbia",
+  "Ismailia",
+  "Menofia",
+  "Minya",
+  "Qalyubia",
+  "New Valley",
+  "North Sinai",
+  "Port Said",
+  "Damietta",
+  "Sharqia",
+  "South Sinai",
+  "Suez",
+  "Luxor",
+  "Matrouh",
+  "Qena",
+  "Sohag",
+  "Aswan",
+  "Assiut",
+  "Beni Suef",
 ];
 
 export default function AdminDelivery() {
@@ -19,20 +41,20 @@ export default function AdminDelivery() {
     try {
       const res = await fetch("/api/delivery_fees");
       const data = await res.json();
-      
+
       const feesMap = {};
       // Initialize all to 100 first as requested
-      DEFAULT_GOVERNORATES.forEach(gov => {
+      DEFAULT_GOVERNORATES.forEach((gov) => {
         feesMap[gov] = 100;
       });
 
       // Override with DB values if any exist
       if (Array.isArray(data)) {
-        data.forEach(item => {
+        data.forEach((item) => {
           feesMap[item.governorate] = item.fee;
         });
       }
-      
+
       setFees(feesMap);
     } catch (err) {
       setError("Failed to load delivery fees");
@@ -51,9 +73,9 @@ export default function AdminDelivery() {
     setError("");
     setSuccess("");
 
-    const governoratesArray = Object.keys(fees).map(gov => ({
+    const governoratesArray = Object.keys(fees).map((gov) => ({
       governorate: gov,
-      fee: Number(fees[gov])
+      fee: Number(fees[gov]),
     }));
 
     try {
@@ -64,7 +86,7 @@ export default function AdminDelivery() {
       });
 
       if (!res.ok) throw new Error("Failed to update fees");
-      
+
       setSuccess("Delivery fees updated successfully!");
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
@@ -76,13 +98,18 @@ export default function AdminDelivery() {
 
   const setAllToValue = (val) => {
     const newFees = { ...fees };
-    Object.keys(newFees).forEach(gov => {
+    Object.keys(newFees).forEach((gov) => {
       newFees[gov] = val;
     });
     setFees(newFees);
   };
 
-  if (loading) return <div className="admin-page"><div className="spinner" /></div>;
+  if (loading)
+    return (
+      <div className="admin-page">
+        <div className="spinner" />
+      </div>
+    );
 
   return (
     <div className="admin-page">
@@ -91,13 +118,13 @@ export default function AdminDelivery() {
         <div className="admin-header">
           <h2>Delivery Fees</h2>
           <div className="header-actions">
-            <button 
+            <button
               className="btn btn-secondary"
               onClick={() => setAllToValue(100)}
             >
               Set All to 100
             </button>
-            <button 
+            <button
               className="btn btn-primary"
               onClick={handleSave}
               disabled={saving}
@@ -121,7 +148,9 @@ export default function AdminDelivery() {
                     min="0"
                     className="form-control"
                     value={fees[gov]}
-                    onChange={(e) => setFees({ ...fees, [gov]: e.target.value })}
+                    onChange={(e) =>
+                      setFees({ ...fees, [gov]: e.target.value })
+                    }
                   />
                   <span className="input-addon">EGP</span>
                 </div>
