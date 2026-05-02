@@ -558,4 +558,7 @@ export default function Navbar() {
           .lang-btn:hover {
             border-color: var(--text);
           }
+      `}</style>
+    </nav>
+  );
 }
