@@ -62,7 +62,7 @@ export default function Navbar() {
               location.pathname === "/" ? "nav-link active" : "nav-link"
             }
           >
-            Home
+            {t("home")}
           </Link>
 
           {categories
@@ -112,16 +112,19 @@ export default function Navbar() {
             })}
 
           <Link to="/track-order" className="nav-link">
-            Track Order
+            {t("trackOrder")}
           </Link>
           {isAdmin && (
             <Link to="/admin/dashboard" className="nav-link nav-admin">
-              Admin
+              {t("admin")}
             </Link>
           )}
         </div>
 
         <div className="navbar-actions">
+          <button className="lang-btn" onClick={toggleLanguage}>
+            {lang === 'en' ? 'عربي' : 'EN'}
+          </button>
           {!isAdmin && (
             <Link
               to="/admin/login"
@@ -172,7 +175,7 @@ export default function Navbar() {
       {menuOpen && (
         <div className="mobile-menu">
           <Link to="/" className="mobile-link">
-            Home
+            {t("home")}
           </Link>
 
           {categories
@@ -239,11 +242,11 @@ export default function Navbar() {
             })}
 
           <Link to="/track-order" className="mobile-link">
-            Track Order
+            {t("trackOrder")}
           </Link>
           {isAdmin && (
-            <Link to="/admin/dashboard" className="mobile-link mobile-admin">
-              Admin
+            <Link to="/admin/dashboard" className="mobile-link nav-admin">
+              {t("admin")}
             </Link>
           )}
         </div>
@@ -541,7 +544,18 @@ export default function Navbar() {
         @media (min-width: 769px) {
           .mobile-menu { display: none !important; }
         }
-      `}</style>
-    </nav>
-  );
+          .lang-btn {
+            background: none;
+            border: 1px solid var(--border);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            transition: var(--transition);
+          }
+          .lang-btn:hover {
+            border-color: var(--text);
+          }
 }

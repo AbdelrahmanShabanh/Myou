@@ -113,7 +113,7 @@ export default function AdminDelivery() {
 
   return (
     <div className="admin-page">
-      <AdminSidebar />
+     
       <div className="admin-content">
         <div className="admin-header">
           <h2>Delivery Fees</h2>
