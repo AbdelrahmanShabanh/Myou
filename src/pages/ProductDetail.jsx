@@ -14,6 +14,7 @@ export default function ProductDetail() {
   const [mainImage, setMainImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState("");
   const [sizeError, setSizeError] = useState(false);
+  const [showSizeChart, setShowSizeChart] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -157,7 +158,12 @@ export default function ProductDetail() {
           <div className="detail-section">
             <div className="section-head">
               <span className="section-label">Select Size</span>
-              <button className="size-guide-btn">Size Guide</button>
+              <button 
+                className="size-guide-btn" 
+                onClick={() => setShowSizeChart(true)}
+              >
+                Size Guide
+              </button>
             </div>
             <div className="size-selector">
               {product.sizes?.map((sizeObj) => (
@@ -244,6 +250,17 @@ export default function ProductDetail() {
         </div>
       </div>
 
+      {showSizeChart && (
+        <div className="size-chart-modal" onClick={() => setShowSizeChart(false)}>
+          <div className="size-chart-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-modal" onClick={() => setShowSizeChart(false)}>
+              ✕
+            </button>
+            <img src="/size-chart.jpg" alt="Size Chart" className="size-chart-img" />
+          </div>
+        </div>
+      )}
+
       <style>{`
         .product-detail-page {
           padding-top: 2rem;
@@ -265,6 +282,9 @@ export default function ProductDetail() {
           grid-template-columns: 1fr 1fr;
           gap: 4rem;
           align-items: start;
+        }
+        .detail-gallery {
+          min-width: 0;
         }
         .main-image-wrap {
           position: relative;
@@ -294,7 +314,16 @@ export default function ProductDetail() {
           display: flex;
           gap: 1rem;
           overflow-x: auto;
+          flex-wrap: nowrap;
           padding-bottom: 0.5rem;
+          width: 100%;
+        }
+        .thumb-strip::-webkit-scrollbar {
+          height: 6px;
+        }
+        .thumb-strip::-webkit-scrollbar-thumb {
+          background: #ccc;
+          border-radius: 10px;
         }
         .thumb-btn {
           width: 80px;
@@ -429,6 +458,47 @@ export default function ProductDetail() {
         @media (max-width: 768px) {
           .detail-grid { grid-template-columns: 1fr; }
           .main-image-wrap { aspect-ratio: 1; }
+        }
+
+        /* Size Chart Modal */
+        .size-chart-modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.6);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 9999;
+          padding: 1rem;
+        }
+        .size-chart-content {
+          background: #fff;
+          padding: 1.5rem;
+          border-radius: var(--radius);
+          position: relative;
+          max-width: 500px;
+          margin: auto;
+          width: 100%;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .close-modal {
+          position: absolute;
+          top: 10px;
+          right: 15px;
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          cursor: pointer;
+          color: #333;
+        }
+        .size-chart-img {
+          width: 100%;
+          height: auto;
+          display: block;
+          border-radius: var(--radius-sm);
         }
       `}</style>
     </div>
