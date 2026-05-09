@@ -101,9 +101,23 @@ export default function AdminOrders() {
                   </div>
                 </td>
                 <td>
-                  <span className="items-count-badge">
-                    {order.items.reduce((s, i) => s + i.qty, 0)} items
-                  </span>
+                  <div className="order-items-list">
+                    {order.items.map((i, idx) => (
+                      <div key={idx} style={{ marginBottom: "6px" }}>
+                        <a
+                          href={`/products/${i.productId || i._id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: "var(--accent)", textDecoration: "underline", fontSize: "0.85rem", fontWeight: 600 }}
+                        >
+                          {i.name}
+                        </a>
+                        <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                          Qty: {i.qty} | Size: {i.size}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </td>
                 <td>
                   <strong>{order.total} EGP</strong>

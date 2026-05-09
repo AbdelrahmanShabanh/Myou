@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
+import { useLanguage } from "../context/LanguageContext.jsx";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { t } = useLanguage();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -50,7 +52,7 @@ export default function ProductDetail() {
     // Show quick toast
     const btn = document.getElementById("add-btn");
     const originalText = btn.innerText;
-    btn.innerText = "Added to Cart! ✓";
+    btn.innerText = t("addedToCart");
     btn.style.backgroundColor = "var(--success)";
     btn.style.color = "#fff";
     setTimeout(() => {
@@ -96,8 +98,8 @@ export default function ProductDetail() {
   return (
     <div className="product-detail-page container">
       <div className="breadcrumb">
-        <Link to="/">Home</Link> <span className="sep">/</span>
-        <Link to="/products">Shop</Link> <span className="sep">/</span>
+        <Link to="/">{t("home")}</Link> <span className="sep">/</span>
+        <Link to="/products">{t("shop")}</Link> <span className="sep">/</span>
         <Link
           to={`/products?category=${product.category}`}
           style={{ textTransform: "capitalize" }}
@@ -117,8 +119,8 @@ export default function ProductDetail() {
               alt={product.name}
               className="main-image"
             />
-            {!inStock && <div className="sold-out-badge">SOLD OUT</div>}
-            {product.featured && <div className="featured-badge">FEATURED</div>}
+            {!inStock && <div className="sold-out-badge">{t("outOfStock")}</div>}
+            {product.featured && <div className="featured-badge">{t("featured")}</div>}
           </div>
           {product.images?.length > 1 && (
             <div className="thumb-strip">
@@ -151,18 +153,18 @@ export default function ProductDetail() {
               className={`status-dot ${inStock ? "in-stock" : "out-stock"}`}
             />
             {inStock
-              ? `${displayStock} items available`
-              : "Currently out of stock"}
+              ? `${displayStock} ${t("itemsAvailable")}`
+              : t("currentlyOut")}
           </div>
 
           <div className="detail-section">
             <div className="section-head">
-              <span className="section-label">Select Size</span>
+              <span className="section-label">{t("selectSize")}</span>
               <button
                 className="size-guide-btn"
                 onClick={() => setShowSizeChart(true)}
               >
-                Size Guide
+                {t("sizeGuide")}
               </button>
             </div>
             <div className="size-selector">
@@ -182,7 +184,7 @@ export default function ProductDetail() {
             </div>
             {sizeError && (
               <p className="error-text">
-                Please select a size before adding to cart.
+                {t("selectSizeError")}
               </p>
             )}
           </div>
@@ -194,7 +196,7 @@ export default function ProductDetail() {
               onClick={handleAdd}
               disabled={!inStock}
             >
-              {inStock ? "Add to Cart" : "Out of Stock"}
+              {inStock ? t("addToCart") : t("outOfStock")}
             </button>
             <button
               className="btn btn-dark btn-lg full-width"
@@ -206,19 +208,19 @@ export default function ProductDetail() {
               }}
               disabled={!inStock}
             >
-              Buy it Now
+              {t("buyNow")}
             </button>
           </div>
 
           <div className="detail-meta">
             {product.material && (
               <div className="meta-item">
-                <span className="meta-label">Material</span>
+                <span className="meta-label">{t("material")}</span>
                 <span className="meta-value">{product.material}</span>
               </div>
             )}
             <div className="meta-item">
-              <span className="meta-label">Category</span>
+              <span className="meta-label">{t("category")}</span>
               <span
                 className="meta-value"
                 style={{ textTransform: "capitalize" }}
@@ -243,8 +245,8 @@ export default function ProductDetail() {
               <circle cx="17" cy="18" r="2" />
             </svg>
             <div>
-              <strong>Fast Delivery</strong>
-              <p>2-3 days in Cairo, 3-4 days in Alex.</p>
+              <strong>{t("fastDelivery")}</strong>
+              <p>{t("fastDeliveryDesc")}</p>
             </div>
           </div>
         </div>

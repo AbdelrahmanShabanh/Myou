@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
 
+import { useLanguage } from "../context/LanguageContext.jsx";
+
 const WHATSAPP_NUMBER = "201070831335";
 
 const GOVERNORATES = [
@@ -63,6 +65,7 @@ const GOV_FEES = {
 };
 
 export default function Checkout() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const { items, cartTotal, clearCart } = useCart();
@@ -141,11 +144,11 @@ export default function Checkout() {
       if (validDiscount) {
         setAppliedDiscount(validDiscount);
       } else {
-        setDiscountError("Invalid or expired discount code.");
+        setDiscountError(t("invalidCode") || "Invalid or expired discount code.");
         setAppliedDiscount(null);
       }
     } catch (err) {
-      setDiscountError("Error verifying discount code.");
+      setDiscountError(t("errorVerifyCode") || "Error verifying discount code.");
     } finally {
       setIsApplying(false);
     }
@@ -159,11 +162,11 @@ export default function Checkout() {
 
   const validate = () => {
     const errs = {};
-    if (!form.fullName.trim()) errs.fullName = "Full name is required";
+    if (!form.fullName.trim()) errs.fullName = t("fullNameReq");
     if (!form.phone.trim() || form.phone.replace(/\D/g, "").length !== 11)
-      errs.phone = "Valid phone number is required (11 digits)";
-    if (!form.governorate) errs.governorate = "Governorate is required";
-    if (!form.address.trim()) errs.address = "Address is required";
+      errs.phone = t("validPhoneReq");
+    if (!form.governorate) errs.governorate = t("govReq");
+    if (!form.address.trim()) errs.address = t("addrReq");
     return errs;
   };
 
@@ -171,9 +174,9 @@ export default function Checkout() {
     const itemLines = items
       .map(
         (item) =>
-          `• ${item.product.name} | Size: ${item.size} | Qty: ${item.qty} | Price: ${item.product.price}`,
+          `• ${item.product.name} | Size: ${item.size} | Qty: ${item.qty} | Price: ${item.product.price}\nLink: ${window.location.origin}/products/${item.product._id}`,
       )
-      .join("\n");
+      .join("\n\n");
 
     const govLabel = form.governorate;
     const payment =

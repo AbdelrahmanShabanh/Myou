@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "../context/LanguageContext.jsx";
 import DiscountScroller from "../components/DiscountScroller.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 
 export default function Home() {
+  const { t } = useLanguage();
   const [discounts, setDiscounts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loadingCats, setLoadingCats] = useState(true);
@@ -40,16 +42,16 @@ export default function Home() {
       <section className="hero">
         <div className="hero-content">
           <h1 className="hero-title">
-            <span className="hero-accent">Dress</span> Different.
+            <span className="hero-accent">{t("heroTitlePart1") || "Dress"}</span> {t("heroTitlePart2") || "Different."}
             <br />
-            Stay <span className="hero-accent">M You.</span>
+            {t("heroTitlePart3") || "Stay"} <span className="hero-accent">{t("heroTitlePart4") || "M You."}</span>
           </h1>
           <p className="hero-subtitle">
-            Premium Handpicked quality, unmatched aesthetic.
+            {t("heroSubtitle")}
           </p>
           <div className="hero-cta">
             <Link to="/products" className="btn btn-primary btn-lg">
-              Shop New Drops
+              {t("shopNewDrops") || "Shop New Drops"}
             </Link>
           </div>
         </div>
@@ -78,8 +80,8 @@ export default function Home() {
           style={{ paddingTop: "5rem" }}
         >
           <div className="section-header text-center">
-            <p className="section-label">Limited Time Only</p>
-            <h2 className="section-title">Special Offers</h2>
+            <p className="section-label">{t("limitedTime") || "Limited Time Only"}</p>
+            <h2 className="section-title">{t("specialOffers")}</h2>
           </div>
           <div className="offers-scroller">
             {loadingOffers
@@ -106,8 +108,8 @@ export default function Home() {
         style={{ paddingTop: offerProducts.length > 0 ? "2rem" : "5rem" }}
       >
         <div className="section-header text-center">
-          <p className="section-label">Shop by</p>
-          <h2 className="section-title">Category</h2>
+          <p className="section-label">{t("shopBy") || "Shop by"}</p>
+          <h2 className="section-title">{t("categories")}</h2>
         </div>
 
         <div className="cat-dynamic-grid">
@@ -132,7 +134,7 @@ export default function Home() {
                     />
                     <div className="cat-overlay">
                       <h3 className="cat-title">{cat.name}</h3>
-                      <span className="cat-link">Shop Now →</span>
+                      <span className="cat-link">{t("shopNow")} →</span>
                     </div>
                   </Link>
                 ))}

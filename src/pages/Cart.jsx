@@ -1,7 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
+import { useLanguage } from "../context/LanguageContext.jsx";
 
 export default function Cart() {
+  const { t } = useLanguage();
   const { items, updateQty, removeFromCart, cartTotal, cartCount } = useCart();
   const navigate = useNavigate();
 
@@ -10,9 +12,9 @@ export default function Cart() {
       <div className="container" style={{padding: '6rem 0'}}>
         <div className="empty-state">
           <div className="empty-state-icon">🛒</div>
-          <h2 className="section-title">Your Cart is Empty</h2>
-          <p className="section-subtitle">Looks like you haven't added anything to your cart yet.</p>
-          <Link to="/products" className="btn btn-primary btn-lg mt-4">Start Shopping</Link>
+          <h2 className="section-title">{t("cartEmptyMsg")}</h2>
+          <p className="section-subtitle">{t("notAddedAnything")}</p>
+          <Link to="/products" className="btn btn-primary btn-lg mt-4">{t("startShopping")}</Link>
         </div>
       </div>
     );
@@ -20,14 +22,14 @@ export default function Cart() {
 
   return (
     <div className="cart-page container">
-      <h1 className="section-title mb-8">Shopping Cart <span className="cart-count">({cartCount} items)</span></h1>
+      <h1 className="section-title mb-8">{t("shoppingCart")} <span className="cart-count">({cartCount} {t("itemsTitle")})</span></h1>
 
       <div className="cart-grid">
         <div className="cart-items">
           <div className="cart-header hide-mobile">
-            <span className="col-product">Product</span>
-            <span className="col-qty">Quantity</span>
-            <span className="col-total">Total</span>
+            <span className="col-product">{t("product")}</span>
+            <span className="col-qty">{t("quantity")}</span>
+            <span className="col-total">{t("total")}</span>
           </div>
 
           <div className="cart-list">
@@ -40,69 +42,66 @@ export default function Cart() {
                   <div className="item-info">
                     <Link to={`/products/${item.product._id}`} className="item-name">{item.product.name}</Link>
                     <div className="item-meta">
-                      <span className="item-size">Size: {item.size}</span>
-                      <span className="item-price">{item.product.price} EGP</span>
+                        <span className="item-size">{t("sizeLabel")} {item.size}</span>
+                        <span className="item-price">{item.product.price} {t("egp")}</span>
+                      </div>
+                      <button 
+                        className="item-remove"
+                        onClick={() => removeFromCart(item.product._id, item.size)}
+                      >
+                        {t("remove")}
+                      </button>
                     </div>
-                    <button 
-                      className="item-remove"
-                      onClick={() => removeFromCart(item.product._id, item.size)}
-                    >
-                      Remove
-                    </button>
+                  </div>
+
+                  <div className="item-qty-col">
+                    <div className="qty-stepper">
+                      <button onClick={() => updateQty(item.product._id, item.size, item.qty - 1)}>-</button>
+                      <span>{item.qty}</span>
+                      <button onClick={() => updateQty(item.product._id, item.size, item.qty + 1)}>+</button>
+                    </div>
+                  </div>
+
+                  <div className="item-total-col">
+                    <span className="item-subtotal">{item.product.price * item.qty} {t("egp")}</span>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
 
-                <div className="item-qty-col">
-                  <div className="qty-stepper">
-                    <button onClick={() => updateQty(item.product._id, item.size, item.qty - 1)}>-</button>
-                    <span>{item.qty}</span>
-                    <button onClick={() => updateQty(item.product._id, item.size, item.qty + 1)}>+</button>
-                  </div>
-                </div>
-
-                <div className="item-total-col">
-                  <span className="item-subtotal">{item.product.price * item.qty} EGP</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="cart-summary">
-          <h3 className="summary-title">Order Summary</h3>
-          <div className="summary-row">
-            <span>Subtotal</span>
-            <span>{cartTotal} EGP</span>
-          </div>
-          <div className="summary-row text-muted">
-            <span>Shipping</span>
-            <span>Calculated at checkout</span>
-          </div>
-          <div className="summary-row text-muted" style={{borderBottom: '1px solid var(--border)', paddingBottom: '1rem', marginBottom: '1rem'}}>
-            <span>Taxes</span>
-            <span>Included</span>
-          </div>
-          <div className="summary-row summary-grand">
-            <span>Estimated Total</span>
-            <span className="accent-text">{cartTotal} EGP</span>
-          </div>
-          
-          <button 
-            className="btn btn-primary btn-lg checkout-btn"
-            onClick={() => navigate('/checkout')}
-          >
-            Proceed to Checkout
-          </button>
-          
-          <div className="secure-checkout">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0110 0v4"/>
-            </svg>
-            Secure Checkout
-          </div>
-        </div>
-      </div>
+          <div className="cart-summary">
+            <h3 className="summary-title">{t("orderSummary")}</h3>
+            <div className="summary-row">
+              <span>{t("subtotal")}</span>
+              <span>{cartTotal} {t("egp")}</span>
+            </div>
+            <div className="summary-row text-muted">
+              <span>{t("shipping")}</span>
+              <span>{t("calcCheckout")}</span>
+            </div>
+            <div className="summary-row text-muted" style={{borderBottom: '1px solid var(--border)', paddingBottom: '1rem', marginBottom: '1rem'}}>
+              <span>{t("taxes")}</span>
+              <span>{t("included")}</span>
+            </div>
+            <div className="summary-row summary-grand">
+              <span>{t("estimatedTotal")}</span>
+              <span className="accent-text">{cartTotal} {t("egp")}</span>
+            </div>
+            
+            <button 
+              className="btn btn-primary btn-lg checkout-btn"
+              onClick={() => navigate('/checkout')}
+            >
+              {t("checkoutBtn")}
+            </button>
+            
+            <div className="secure-checkout">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0110 0v4"/>
+              </svg>
+              {t("secureCheckout")}
 
       <style>{`
         .cart-page { padding-top: 3rem; padding-bottom: 6rem; }

@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
+import { useLanguage } from "../context/LanguageContext.jsx";
 
 export default function ProductCard({ product }) {
+  const { t } = useLanguage();
   const { addToCart } = useCart();
   const navigate = useNavigate();
   const mainImg = product.images?.[0];
@@ -53,19 +55,19 @@ export default function ProductCard({ product }) {
             </svg>
           </div>
         )}
-        {!inStock && <div className="sold-out-overlay">SOLD OUT</div>}
+        {!inStock && <div className="sold-out-overlay">{t("outOfStock")}</div>}
         {product.isOffer ? (
           <span className="featured-tag" style={{ background: "var(--error)" }}>
-            Sale
+            {t("sale")}
           </span>
         ) : product.featured ? (
-          <span className="featured-tag">Featured</span>
+          <span className="featured-tag">{t("featured")}</span>
         ) : null}
         <button
           className="quick-add-btn"
           onClick={handleQuickAdd}
           disabled={!inStock}
-          title="Quick Add"
+          title={t("quickAdd")}
         >
           <svg
             width="16"
@@ -97,7 +99,7 @@ export default function ProductCard({ product }) {
                 {product.oldPrice}
               </span>
             )}
-            {product.price} EGP
+            {product.price} {t("egp")}
           </span>
           <div className="size-chips">
             {availableSizes.slice(0, 3).map((s) => (

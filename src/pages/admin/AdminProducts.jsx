@@ -252,14 +252,28 @@ export default function AdminProducts() {
                     <button
                       className="icon-btn edt"
                       onClick={() => openEdit(p)}
+                      title="Edit"
                     >
-                      ✎ Edit
+                      ✎
                     </button>
                     <button
                       className="icon-btn del"
                       onClick={() => handleDelete(p._id)}
+                      title="Delete"
                     >
-                      🗑 Del
+                      🗑
+                    </button>
+                    <button
+                      className="icon-btn"
+                      onClick={() => {
+                        const url = `${window.location.origin}/products/${p._id}`;
+                        navigator.clipboard.writeText(url);
+                        alert("Link copied! " + url);
+                      }}
+                      title="Copy Product Link"
+                      style={{ background: "var(--bg-elevated)", color: "var(--text-main)" }}
+                    >
+                      🔗
                     </button>
                   </div>
                 </td>

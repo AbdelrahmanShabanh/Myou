@@ -1,7 +1,9 @@
 import { useSearchParams } from "react-router-dom";
+import { useLanguage } from "../context/LanguageContext.jsx";
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 
 export default function FilterSidebar({ filters, onChange, categories }) {
+  const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const handleCategory = (cat) => {
@@ -34,16 +36,16 @@ export default function FilterSidebar({ filters, onChange, categories }) {
   return (
     <aside className="filter-sidebar">
       <div className="filter-header">
-        <h3 className="filter-title">Filters</h3>
+        <h3 className="filter-title">{t("filters")}</h3>
         {hasFilters && (
           <button className="filter-clear-btn" onClick={clearAll}>
-            Clear all
+            {t("clearAll")}
           </button>
         )}
       </div>
 
       <div className="filter-section">
-        <p className="filter-section-label">Category</p>
+        <p className="filter-section-label">{t("category")}</p>
         <div className="category-pills">
           {mainCategories.map((cat) => {
             const subCats = getSubcategories(cat._id);
@@ -78,7 +80,7 @@ export default function FilterSidebar({ filters, onChange, categories }) {
       </div>
 
       <div className="filter-section">
-        <p className="filter-section-label">Size</p>
+        <p className="filter-section-label">{t("size")}</p>
         <div className="size-grid">
           {SIZES.map((size) => (
             <button
@@ -94,8 +96,8 @@ export default function FilterSidebar({ filters, onChange, categories }) {
 
       <div className="filter-section">
         <p className="filter-section-label">
-          Max Price:{" "}
-          <span className="price-val">{filters.maxPrice || 600} EGP</span>
+          {t("maxPrice")}:{" "}
+          <span className="price-val">{filters.maxPrice || 600} {t("egp")}</span>
         </p>
         <input
           type="range"
@@ -107,8 +109,8 @@ export default function FilterSidebar({ filters, onChange, categories }) {
           className="price-slider"
         />
         <div className="price-range-labels">
-          <span>50 EGP</span>
-          <span>600 EGP</span>
+          <span>50 {t("egp")}</span>
+          <span>600 {t("egp")}</span>
         </div>
       </div>
 

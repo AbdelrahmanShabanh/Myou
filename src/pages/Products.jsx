@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
+import { useLanguage } from "../context/LanguageContext.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import SkeletonCard from "../components/SkeletonCard.jsx";
 import FilterSidebar from "../components/FilterSidebar.jsx";
 
 export default function Products() {
+  const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -99,14 +101,14 @@ export default function Products() {
   return (
     <div className="products-page container">
       <div className="page-header">
-        <h1 className="section-title">Shop All</h1>
+        <h1 className="section-title">{t("shopAll")}</h1>
         <p className="page-subtitle">
-          Showing{" "}
+          {t("showing")}{" "}
           {loading
             ? "..."
             : subCategories.length > 0
-              ? subCategories.length + " Categories"
-              : products.length + " results"}
+              ? `${subCategories.length} ${t("categoriesText")}`
+              : `${products.length} ${t("resultsText")}`}
         </p>
       </div>
 
