@@ -102,6 +102,9 @@ export default function Cart() {
                 <path d="M7 11V7a5 5 0 0110 0v4"/>
               </svg>
               {t("secureCheckout")}
+            </div>
+          </div>
+        </div>
 
       <style>{`
         .cart-page { padding-top: 3rem; padding-bottom: 6rem; }
