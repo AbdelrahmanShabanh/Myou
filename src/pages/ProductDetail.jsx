@@ -119,8 +119,12 @@ export default function ProductDetail() {
               alt={product.name}
               className="main-image"
             />
-            {!inStock && <div className="sold-out-badge">{t("outOfStock")}</div>}
-            {product.featured && <div className="featured-badge">{t("featured")}</div>}
+            {!inStock && (
+              <div className="sold-out-badge">{t("outOfStock")}</div>
+            )}
+            {product.featured && (
+              <div className="featured-badge">{t("featured")}</div>
+            )}
           </div>
           {product.images?.length > 1 && (
             <div className="thumb-strip">
@@ -182,11 +186,7 @@ export default function ProductDetail() {
                 </button>
               ))}
             </div>
-            {sizeError && (
-              <p className="error-text">
-                {t("selectSizeError")}
-              </p>
-            )}
+            {sizeError && <p className="error-text">{t("selectSizeError")}</p>}
           </div>
 
           <div className="detail-actions">

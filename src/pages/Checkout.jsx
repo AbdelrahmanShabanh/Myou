@@ -144,11 +144,15 @@ export default function Checkout() {
       if (validDiscount) {
         setAppliedDiscount(validDiscount);
       } else {
-        setDiscountError(t("invalidCode") || "Invalid or expired discount code.");
+        setDiscountError(
+          t("invalidCode") || "Invalid or expired discount code.",
+        );
         setAppliedDiscount(null);
       }
     } catch (err) {
-      setDiscountError(t("errorVerifyCode") || "Error verifying discount code.");
+      setDiscountError(
+        t("errorVerifyCode") || "Error verifying discount code.",
+      );
     } finally {
       setIsApplying(false);
     }

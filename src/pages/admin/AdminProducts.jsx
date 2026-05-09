@@ -271,7 +271,10 @@ export default function AdminProducts() {
                         alert("Link copied! " + url);
                       }}
                       title="Copy Product Link"
-                      style={{ background: "var(--bg-elevated)", color: "var(--text-main)" }}
+                      style={{
+                        background: "var(--bg-elevated)",
+                        color: "var(--text-main)",
+                      }}
                     >
                       🔗
                     </button>

@@ -42,13 +42,17 @@ export default function Home() {
       <section className="hero">
         <div className="hero-content">
           <h1 className="hero-title">
-            <span className="hero-accent">{t("heroTitlePart1") || "Dress"}</span> {t("heroTitlePart2") || "Different."}
+            <span className="hero-accent">
+              {t("heroTitlePart1") || "Dress"}
+            </span>{" "}
+            {t("heroTitlePart2") || "Different."}
             <br />
-            {t("heroTitlePart3") || "Stay"} <span className="hero-accent">{t("heroTitlePart4") || "M You."}</span>
+            {t("heroTitlePart3") || "Stay"}{" "}
+            <span className="hero-accent">
+              {t("heroTitlePart4") || "M You."}
+            </span>
           </h1>
-          <p className="hero-subtitle">
-            {t("heroSubtitle")}
-          </p>
+          <p className="hero-subtitle">{t("heroSubtitle")}</p>
           <div className="hero-cta">
             <Link to="/products" className="btn btn-primary btn-lg">
               {t("shopNewDrops") || "Shop New Drops"}
@@ -80,7 +84,9 @@ export default function Home() {
           style={{ paddingTop: "5rem" }}
         >
           <div className="section-header text-center">
-            <p className="section-label">{t("limitedTime") || "Limited Time Only"}</p>
+            <p className="section-label">
+              {t("limitedTime") || "Limited Time Only"}
+            </p>
             <h2 className="section-title">{t("specialOffers")}</h2>
           </div>
           <div className="offers-scroller">
