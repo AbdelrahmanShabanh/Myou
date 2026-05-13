@@ -15,7 +15,9 @@ export default function ProductDetail() {
 
   const [mainImage, setMainImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
   const [sizeError, setSizeError] = useState(false);
+  const [colorError, setColorError] = useState(false);
   const [showSizeChart, setShowSizeChart] = useState(false);
 
   useEffect(() => {
@@ -42,12 +44,24 @@ export default function ProductDetail() {
   }, [id]);
 
   const handleAdd = () => {
+    let hasErr = false;
     if (!selectedSize) {
       setSizeError(true);
-      return;
+      hasErr = true;
+    } else {
+      setSizeError(false);
     }
-    setSizeError(false);
-    addToCart(product, selectedSize);
+    
+    if (product.colors && product.colors.length > 0 && !selectedColor) {
+      setColorError(true);
+      hasErr = true;
+    } else {
+      setColorError(false);
+    }
+
+    if (hasErr) return;
+
+    addToCart(product, selectedSize, selectedColor);
 
     // Show quick toast
     const btn = document.getElementById("add-btn");
@@ -188,6 +202,44 @@ export default function ProductDetail() {
             </div>
             {sizeError && <p className="error-text">{t("selectSizeError")}</p>}
           </div>
+
+          {product.colors && product.colors.length > 0 && (
+            <div className="detail-section">
+              <div className="section-head">
+                <span className="section-label">Select Color</span>
+              </div>
+              <div className="color-selector" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                {product.colors.map((color) => {
+                  const cleanedStr = color.trim();
+                  // A simple generic regex matching basic english color names or hex matching would work, 
+                  // but we use the exact string as background too if valid CSS color like "blue" or "red".
+                  return (
+                    <button
+                      key={color}
+                      className={`color-btn-lg ${selectedColor === color ? "active" : ""}`}
+                      style={{
+                        backgroundColor: cleanedStr,
+                        padding: '10px 20px',
+                        border: selectedColor === color ? '2px solid black' : '1px solid #ccc',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        color: ['white', 'yellow', 'cyan', 'lime'].includes(cleanedStr.toLowerCase()) ? 'black' : 'white',
+                        fontWeight: 'bold',
+                        opacity: 0.9,
+                      }}
+                      onClick={() => {
+                        setSelectedColor(color);
+                        setColorError(false);
+                      }}
+                    >
+                      {cleanedStr}
+                    </button>
+                  );
+                })}
+              </div>
+              {colorError && <p className="error-text">Please select a color</p>}
+            </div>
+          )}
 
           <div className="detail-actions">
             <button

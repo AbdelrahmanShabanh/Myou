@@ -85,6 +85,7 @@ export default function Checkout() {
   const [submitted, setSubmitted] = useState(false);
   const [showReturnPolicy, setShowReturnPolicy] = useState(false);
   const [hasCopiedVodafone, setHasCopiedVodafone] = useState(false);
+  const [hasCopiedInstapay, setHasCopiedInstapay] = useState(false);
   const [discountCode, setDiscountCode] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState(null);
   const [discountError, setDiscountError] = useState("");
@@ -178,13 +179,13 @@ export default function Checkout() {
     const itemLines = items
       .map(
         (item) =>
-          `• ${item.product.name} | Size: ${item.size} | Qty: ${item.qty} | Price: ${item.product.price}\nLink: ${window.location.origin}/products/${item.product._id}`,
+          `• ${item.product.name} | Size: ${item.size} ${item.color ? `| Color: ${item.color} ` : ''}| Qty: ${item.qty} | Price: ${item.product.price}\nLink: ${window.location.origin}/products/${item.product._id}`,
       )
       .join("\n\n");
 
     const govLabel = form.governorate;
     const payment =
-      paymentMethod === "cash" ? "Cash on Delivery" : "Vodafone Cash";
+      paymentMethod === "cash" ? "Cash on Delivery" : paymentMethod === "instapay" ? "Instapay" : "Vodafone Cash";
 
     let msgStr = `*New Order from ${form.fullName}*\n\n`;
     let body =
@@ -227,10 +228,7 @@ export default function Checkout() {
         productId: item.product._id,
         name: item.product.name,
         size: item.size,
-        qty: item.qty,
-        price: item.product.price,
-        image: item.product.images?.[0] || "",
-      }));
+      color: item.color,
 
       await fetch("/api/orders", {
         method: "POST",
@@ -244,8 +242,7 @@ export default function Checkout() {
           address: form.address,
           items: orderItems,
           total: finalTotal,
-          paymentMethod:
-            paymentMethod === "cash" ? "cash_on_delivery" : "vodafone_cash",
+          paymentMethod: paymentMethod === "cash" ? "cash_on_delivery" : paymentMethod === "instapay" ? "instapay" : "vodafone_cash",
           notes: appliedDiscount
             ? `Discount Applied: ${appliedDiscount.code} (-${appliedDiscount.discountPercent}%)`
             : "",
@@ -592,6 +589,40 @@ export default function Checkout() {
                 />
                 <span style={{ fontWeight: 600 }}>Vodafone Cash</span>
               </label>
+
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.75rem",
+                  padding: "1.25rem",
+                  background: "var(--bg-elevated)",
+                  borderRadius: "var(--radius-sm)",
+                  border:
+                    paymentMethod === "instapay"
+                      ? "2px solid var(--accent)"
+                      : "1px solid var(--border)",
+                  cursor: "pointer",
+                }}
+              >
+                <input
+                  type="radio"
+                  name="payment"
+                  value="instapay"
+                  style={{
+                    accentColor: "var(--accent)",
+                    margin: 0,
+                    width: "18px",
+                    height: "18px",
+                  }}
+                  checked={paymentMethod === "instapay"}
+                  onChange={() => {
+                    setPaymentMethod("instapay");
+                    setHasCopiedInstapay(false);
+                  }}
+                />
+                <span style={{ fontWeight: 600 }}>Instapay</span>
+              </label>
             </div>
 
             {/* Vodafone Cash instructions */}
@@ -641,6 +672,57 @@ export default function Checkout() {
                   {hasCopiedVodafone
                     ? "تم فتح الرابط ✓"
                     : "الدفع عبر فودافون كاش"}
+                </a>
+              </div>
+            )}
+
+            {/* Instapay instructions */}
+            {paymentMethod === "instapay" && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
+                  padding: "1.25rem",
+                  background: "rgba(81, 38, 139, 0.1)",
+                  borderRadius: "var(--radius-sm)",
+                  color: "var(--text)",
+                }}
+              >
+                <p
+                  style={{ lineHeight: 1.6, fontSize: "0.9rem", margin: 0 }}
+                  dir="rtl"
+                >
+                  يرجى الضغط على الزر أدناه للدفع عبر انستاباي.
+                  <br />
+                  <strong>مهم:</strong> يجب التقاط لقطة شاشة (سكرين شوت) للتحويل
+                  وإرسالها على الواتساب مع الطلب لتأكيد الدفع.
+                </p>
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setHasCopiedInstapay(true)}
+                  style={{
+                    backgroundColor: "#51268b",
+                    color: "#fff",
+                    padding: "0.8rem 1.5rem",
+                    borderRadius: "8px",
+                    border: "none",
+                    fontWeight: "bold",
+                    fontSize: "1rem",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                    alignSelf: "flex-start",
+                    textDecoration: "none",
+                  }}
+                >
+                  {hasCopiedInstapay
+                    ? "تم فتح الرابط ✓"
+                    : "Pay with Instapay"}
                 </a>
               </div>
             )}

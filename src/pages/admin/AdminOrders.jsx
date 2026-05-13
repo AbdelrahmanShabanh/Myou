@@ -123,7 +123,7 @@ export default function AdminOrders() {
                             color: "var(--text-muted)",
                           }}
                         >
-                          Qty: {i.qty} | Size: {i.size}
+                          Qty: {i.qty} | Size: {i.size} {i.color ? `| Color: ${i.color}` : ''}
                         </div>
                       </div>
                     ))}

@@ -32,22 +32,22 @@ export default function CartDrawer() {
           ) : (
             <div className="cart-drawer-items">
               {items.map(item => (
-                <div key={`${item.product._id}-${item.size}`} className="drawer-item">
+                <div key={`${item.product._id}-${item.size}-${item.color}`} className="drawer-item">
                   <div className="drawer-item-img">
                     <img src={item.product.images?.[0]} alt={item.product.name} />
                   </div>
                   <div className="drawer-item-info">
                     <div className="drawer-item-header">
                       <Link to={`/products/${item.product._id}`} onClick={closeCart} className="drawer-item-name">{item.product.name}</Link>
-                      <button className="drawer-item-remove" onClick={() => removeFromCart(item.product._id, item.size)}>✕</button>
+                      <button className="drawer-item-remove" onClick={() => removeFromCart(item.product._id, item.size, item.color)}>✕</button>
                     </div>
-                    <div className="drawer-item-meta">{t("sizeLabel")} {item.size}</div>
+                    <div className="drawer-item-meta">{t("sizeLabel")} {item.size} {item.color ? `· ${item.color}` : ''}</div>
                     
                     <div className="drawer-item-bottom">
                       <div className="drawer-qty-stepper">
-                        <button onClick={() => updateQty(item.product._id, item.size, item.qty - 1)}>-</button>
+                        <button onClick={() => updateQty(item.product._id, item.size, item.color, item.qty - 1)}>-</button>
                         <span>{item.qty}</span>
-                        <button onClick={() => updateQty(item.product._id, item.size, item.qty + 1)}>+</button>
+                        <button onClick={() => updateQty(item.product._id, item.size, item.color, item.qty + 1)}>+</button>
                       </div>
                       <div className="drawer-item-price">{item.product.price} {t("egp")}</div>
                     </div>

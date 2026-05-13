@@ -6,6 +6,7 @@ export default function AdminProducts() {
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [hasColors, setHasColors] = useState(false);
 
   const [formData, setFormData] = useState(getInitialForm());
   const [editId, setEditId] = useState(null);
@@ -19,6 +20,7 @@ export default function AdminProducts() {
       oldPrice: "",
       category: "",
       sizes: [],
+      colors: [],
       stock: 0,
       material: "",
       images: [],
@@ -122,14 +124,17 @@ export default function AdminProducts() {
     setFormData({
       ...product,
       sizes: product.sizes || [],
+      colors: product.colors || [],
       images: product.images || [],
     });
+    setHasColors(product.colors && product.colors.length > 0);
     setShowModal(true);
   };
 
   const openNew = () => {
     setEditId(null);
     setFormData(getInitialForm());
+    setHasColors(false);
     setShowModal(true);
   };
 
@@ -411,6 +416,38 @@ export default function AdminProducts() {
                     );
                   })}
                 </div>
+              </div>
+
+              <div className="form-group" style={{ marginTop: "1rem" }}>
+                <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <input
+                    type="checkbox"
+                    checked={hasColors}
+                    onChange={(e) => {
+                      setHasColors(e.target.checked);
+                      if (!e.target.checked) {
+                        setFormData((prev) => ({ ...prev, colors: [] }));
+                      }
+                    }}
+                  />
+                  Has Colors?
+                </label>
+                {hasColors && (
+                  <div style={{ marginTop: "0.5rem" }}>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="Enter colors separated by comma (e.g. red, blue, green)"
+                      value={(formData.colors || []).join(", ")}
+                      onChange={(e) => {
+                        setFormData((prev) => ({ 
+                          ...prev, 
+                          colors: e.target.value ? e.target.value.split(",").map(c => c.trim()) : [] 
+                        }));
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="form-row">

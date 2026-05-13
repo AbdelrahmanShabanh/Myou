@@ -20,7 +20,7 @@ export function CartProvider({ children }) {
     localStorage.setItem("myou_cart", JSON.stringify(items));
   }, [items]);
 
-  const addToCart = (product, size) => {
+  const addToCart = (product, size, color) => {
     setItems((prev) => {
       let maxStock = product.stock;
       if (product.sizes && product.sizes.length > 0) {
@@ -31,36 +31,36 @@ export function CartProvider({ children }) {
       if (maxStock <= 0) return prev; // Do not add
 
       const existing = prev.find(
-        (i) => i.product._id === product._id && i.size === size,
+        (i) => i.product._id === product._id && i.size === size && i.color === color,
       );
       if (existing) {
         if (existing.qty >= maxStock) return prev; // Prevent adding more than stock
 
         return prev.map((i) =>
-          i.product._id === product._id && i.size === size
+          i.product._id === product._id && i.size === size && i.color === color
             ? { ...i, qty: i.qty + 1 }
             : i,
         );
       }
-      return [...prev, { product, size, qty: 1 }];
+      return [...prev, { product, size, color, qty: 1 }];
     });
     openCart();
   };
 
-  const removeFromCart = (productId, size) => {
+  const removeFromCart = (productId, size, color) => {
     setItems((prev) =>
-      prev.filter((i) => !(i.product._id === productId && i.size === size)),
+      prev.filter((i) => !(i.product._id === productId && i.size === size && i.color === color)),
     );
   };
 
-  const updateQty = (productId, size, newQty) => {
+  const updateQty = (productId, size, color, newQty) => {
     if (newQty < 1) {
-      removeFromCart(productId, size);
+      removeFromCart(productId, size, color);
       return;
     }
     setItems((prev) =>
       prev.map((i) => {
-        if (i.product._id === productId && i.size === size) {
+        if (i.product._id === productId && i.size === size && i.color === color) {
           let maxStock = i.product.stock;
           if (i.product.sizes && i.product.sizes.length > 0) {
             const sizeObj = i.product.sizes.find((s) => s.size === size);
