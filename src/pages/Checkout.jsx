@@ -179,13 +179,17 @@ export default function Checkout() {
     const itemLines = items
       .map(
         (item) =>
-          `• ${item.product.name} | Size: ${item.size} ${item.color ? `| Color: ${item.color} ` : ''}| Qty: ${item.qty} | Price: ${item.product.price}\nLink: ${window.location.origin}/products/${item.product._id}`,
+          `• ${item.product.name} | Size: ${item.size} ${item.color ? `| Color: ${item.color} ` : ""}| Qty: ${item.qty} | Price: ${item.product.price}\nLink: ${window.location.origin}/products/${item.product._id}`,
       )
       .join("\n\n");
 
     const govLabel = form.governorate;
     const payment =
-      paymentMethod === "cash" ? "Cash on Delivery" : paymentMethod === "instapay" ? "Instapay" : "Vodafone Cash";
+      paymentMethod === "cash"
+        ? "Cash on Delivery"
+        : paymentMethod === "instapay"
+          ? "Instapay"
+          : "Vodafone Cash";
 
     let msgStr = `*New Order from ${form.fullName}*\n\n`;
     let body =
@@ -246,7 +250,12 @@ export default function Checkout() {
           address: form.address,
           items: orderItems,
           total: finalTotal,
-          paymentMethod: paymentMethod === "cash" ? "cash_on_delivery" : paymentMethod === "instapay" ? "instapay" : "vodafone_cash",
+          paymentMethod:
+            paymentMethod === "cash"
+              ? "cash_on_delivery"
+              : paymentMethod === "instapay"
+                ? "instapay"
+                : "vodafone_cash",
           notes: appliedDiscount
             ? `Discount Applied: ${appliedDiscount.code} (-${appliedDiscount.discountPercent}%)`
             : "",
@@ -724,9 +733,7 @@ export default function Checkout() {
                     textDecoration: "none",
                   }}
                 >
-                  {hasCopiedInstapay
-                    ? "تم فتح الرابط ✓"
-                    : "Pay with Instapay"}
+                  {hasCopiedInstapay ? "تم فتح الرابط ✓" : "Pay with Instapay"}
                 </a>
               </div>
             )}
