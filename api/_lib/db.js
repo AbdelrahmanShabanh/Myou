@@ -16,7 +16,12 @@ const ProductSchema = new mongoose.Schema({
       stock: { type: Number, default: 0 },
     },
   ],
-  colors: [String],
+  colors: [
+    {
+      color: { type: String, required: true },
+      stock: { type: Number, default: 0 },
+    },
+  ],
   stock: { type: Number, default: 0 },
   images: [String],
   material: { type: String },

@@ -212,36 +212,53 @@ export default function ProductDetail() {
                 className="color-selector"
                 style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}
               >
-                {product.colors.map((color) => {
-                  const cleanedStr = color.trim();
-                  // A simple generic regex matching basic english color names or hex matching would work,
-                  // but we use the exact string as background too if valid CSS color like "blue" or "red".
+                {product.colors.map((colorObj) => {
+                  const colorName = typeof colorObj === 'string' ? colorObj : colorObj.color;
+                  const colorStock = typeof colorObj === 'string' ? 99 : colorObj.stock;
+                  const cleanedStr = colorName.trim();
+                  const isSoldOut = colorStock <= 0;
+                  
                   return (
                     <button
-                      key={color}
-                      className={`color-btn-lg ${selectedColor === color ? "active" : ""}`}
+                      key={colorName}
+                      disabled={isSoldOut}
+                      className={`color-btn-lg ${selectedColor === colorName ? "active" : ""}`}
                       style={{
+                        position: "relative",
                         backgroundColor: cleanedStr,
                         padding: "10px 20px",
                         border:
-                          selectedColor === color
+                          selectedColor === colorName
                             ? "2px solid black"
                             : "1px solid #ccc",
                         borderRadius: "4px",
-                        cursor: "pointer",
-                        color: ["white", "yellow", "cyan", "lime"].includes(
+                        cursor: isSoldOut ? "not-allowed" : "pointer",
+                        color: ["white", "yellow", "cyan", "lime", "pink"].includes(
                           cleanedStr.toLowerCase(),
                         )
                           ? "black"
                           : "white",
                         fontWeight: "bold",
-                        opacity: 0.9,
+                        opacity: isSoldOut ? 0.3 : 0.9,
+                        overflow: "hidden"
                       }}
                       onClick={() => {
-                        setSelectedColor(color);
+                        setSelectedColor(colorName);
                         setColorError(false);
                       }}
                     >
+                      {isSoldOut && (
+                        <div style={{
+                          position: "absolute",
+                          top: "50%",
+                          left: "-10%",
+                          width: "120%",
+                          height: "2px",
+                          backgroundColor: "red",
+                          transform: "rotate(-25deg)",
+                          zIndex: 2
+                        }} />
+                      )}
                       {cleanedStr}
                     </button>
                   );
