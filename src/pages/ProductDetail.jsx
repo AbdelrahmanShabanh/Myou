@@ -213,11 +213,13 @@ export default function ProductDetail() {
                 style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}
               >
                 {product.colors.map((colorObj) => {
-                  const colorName = typeof colorObj === 'string' ? colorObj : colorObj.color;
-                  const colorStock = typeof colorObj === 'string' ? 99 : colorObj.stock;
+                  const colorName =
+                    typeof colorObj === "string" ? colorObj : colorObj.color;
+                  const colorStock =
+                    typeof colorObj === "string" ? 99 : colorObj.stock;
                   const cleanedStr = colorName.trim();
                   const isSoldOut = colorStock <= 0;
-                  
+
                   return (
                     <button
                       key={colorName}
@@ -233,14 +235,18 @@ export default function ProductDetail() {
                             : "1px solid #ccc",
                         borderRadius: "4px",
                         cursor: isSoldOut ? "not-allowed" : "pointer",
-                        color: ["white", "yellow", "cyan", "lime", "pink"].includes(
-                          cleanedStr.toLowerCase(),
-                        )
+                        color: [
+                          "white",
+                          "yellow",
+                          "cyan",
+                          "lime",
+                          "pink",
+                        ].includes(cleanedStr.toLowerCase())
                           ? "black"
                           : "white",
                         fontWeight: "bold",
                         opacity: isSoldOut ? 0.3 : 0.9,
-                        overflow: "hidden"
+                        overflow: "hidden",
                       }}
                       onClick={() => {
                         setSelectedColor(colorName);
@@ -248,16 +254,18 @@ export default function ProductDetail() {
                       }}
                     >
                       {isSoldOut && (
-                        <div style={{
-                          position: "absolute",
-                          top: "50%",
-                          left: "-10%",
-                          width: "120%",
-                          height: "2px",
-                          backgroundColor: "red",
-                          transform: "rotate(-25deg)",
-                          zIndex: 2
-                        }} />
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "50%",
+                            left: "-10%",
+                            width: "120%",
+                            height: "2px",
+                            backgroundColor: "red",
+                            transform: "rotate(-25deg)",
+                            zIndex: 2,
+                          }}
+                        />
                       )}
                       {cleanedStr}
                     </button>

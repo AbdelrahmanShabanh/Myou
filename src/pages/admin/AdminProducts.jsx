@@ -441,38 +441,74 @@ export default function AdminProducts() {
                       type="text"
                       className="form-input"
                       placeholder="Enter colors separated by comma (e.g. red, blue, green)"
-                      value={(formData.colors || []).map(c => typeof c === 'string' ? c : c.color).join(", ")}
+                      value={(formData.colors || [])
+                        .map((c) => (typeof c === "string" ? c : c.color))
+                        .join(", ")}
                       onChange={(e) => {
-                        const newColors = e.target.value.split(",").map(c => c.trim()).filter(Boolean);
+                        const newColors = e.target.value
+                          .split(",")
+                          .map((c) => c.trim())
+                          .filter(Boolean);
                         setFormData((prev) => {
-                          const updatedColors = newColors.map(cName => {
-                             const existing = (prev.colors || []).find(c => (typeof c === 'string' ? c : c.color) === cName);
-                             return existing ? (typeof existing === 'string' ? { color: existing, stock: 0 } : existing) : { color: cName, stock: 0 };
+                          const updatedColors = newColors.map((cName) => {
+                            const existing = (prev.colors || []).find(
+                              (c) =>
+                                (typeof c === "string" ? c : c.color) === cName,
+                            );
+                            return existing
+                              ? typeof existing === "string"
+                                ? { color: existing, stock: 0 }
+                                : existing
+                              : { color: cName, stock: 0 };
                           });
                           return { ...prev, colors: updatedColors };
                         });
                       }}
                     />
-                    <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "10px" }}>
+                    <div
+                      style={{
+                        marginTop: "1rem",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                      }}
+                    >
                       {(formData.colors || []).map((cObj, idx) => {
-                        const cName = typeof cObj === 'string' ? cObj : cObj.color;
-                        const cStock = typeof cObj === 'string' ? 0 : cObj.stock;
+                        const cName =
+                          typeof cObj === "string" ? cObj : cObj.color;
+                        const cStock =
+                          typeof cObj === "string" ? 0 : cObj.stock;
                         return (
-                          <div key={idx} style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                            <span style={{ width: "80px", fontWeight: "bold" }}>{cName}</span>
+                          <div
+                            key={idx}
+                            style={{
+                              display: "flex",
+                              gap: "10px",
+                              alignItems: "center",
+                            }}
+                          >
+                            <span style={{ width: "80px", fontWeight: "bold" }}>
+                              {cName}
+                            </span>
                             <input
                               type="number"
                               className="form-input"
-                              style={{ width: "100px", padding: "0.25rem 0.5rem" }}
+                              style={{
+                                width: "100px",
+                                padding: "0.25rem 0.5rem",
+                              }}
                               min="0"
                               placeholder="Stock"
                               value={cStock}
                               onChange={(e) => {
                                 const newStock = Number(e.target.value);
-                                setFormData(prev => {
+                                setFormData((prev) => {
                                   const newColors = [...prev.colors];
-                                  if (typeof newColors[idx] === 'string') {
-                                    newColors[idx] = { color: newColors[idx], stock: newStock };
+                                  if (typeof newColors[idx] === "string") {
+                                    newColors[idx] = {
+                                      color: newColors[idx],
+                                      stock: newStock,
+                                    };
                                   } else {
                                     newColors[idx].stock = newStock;
                                   }
