@@ -31,7 +31,8 @@ export function CartProvider({ children }) {
       if (maxStock <= 0) return prev; // Do not add
 
       const existing = prev.find(
-        (i) => i.product._id === product._id && i.size === size && i.color === color,
+        (i) =>
+          i.product._id === product._id && i.size === size && i.color === color,
       );
       if (existing) {
         if (existing.qty >= maxStock) return prev; // Prevent adding more than stock
@@ -49,7 +50,14 @@ export function CartProvider({ children }) {
 
   const removeFromCart = (productId, size, color) => {
     setItems((prev) =>
-      prev.filter((i) => !(i.product._id === productId && i.size === size && i.color === color)),
+      prev.filter(
+        (i) =>
+          !(
+            i.product._id === productId &&
+            i.size === size &&
+            i.color === color
+          ),
+      ),
     );
   };
 
@@ -60,7 +68,11 @@ export function CartProvider({ children }) {
     }
     setItems((prev) =>
       prev.map((i) => {
-        if (i.product._id === productId && i.size === size && i.color === color) {
+        if (
+          i.product._id === productId &&
+          i.size === size &&
+          i.color === color
+        ) {
           let maxStock = i.product.stock;
           if (i.product.sizes && i.product.sizes.length > 0) {
             const sizeObj = i.product.sizes.find((s) => s.size === size);

@@ -61,7 +61,8 @@ export default function Cart() {
                     </Link>
                     <div className="item-meta">
                       <span className="item-size">
-                        {t("sizeLabel")} {item.size} {item.color ? `· ${item.color}` : ''}
+                        {t("sizeLabel")} {item.size}{" "}
+                        {item.color ? `· ${item.color}` : ""}
                       </span>
                       <span className="item-price">
                         {item.product.price} {t("egp")}
@@ -82,7 +83,12 @@ export default function Cart() {
                   <div className="qty-stepper">
                     <button
                       onClick={() =>
-                        updateQty(item.product._id, item.size, item.color, item.qty - 1)
+                        updateQty(
+                          item.product._id,
+                          item.size,
+                          item.color,
+                          item.qty - 1,
+                        )
                       }
                     >
                       -
@@ -90,7 +96,12 @@ export default function Cart() {
                     <span>{item.qty}</span>
                     <button
                       onClick={() =>
-                        updateQty(item.product._id, item.size, item.color, item.qty + 1)
+                        updateQty(
+                          item.product._id,
+                          item.size,
+                          item.color,
+                          item.qty + 1,
+                        )
                       }
                     >
                       +

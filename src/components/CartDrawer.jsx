@@ -1,24 +1,39 @@
-import { useCart } from '../context/CartContext.jsx';
-import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from "../context/CartContext.jsx";
+import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext.jsx";
 
 export default function CartDrawer() {
   const { t } = useLanguage();
-  const { isCartOpen, closeCart, items, updateQty, removeFromCart, cartTotal, cartCount } = useCart();
+  const {
+    isCartOpen,
+    closeCart,
+    items,
+    updateQty,
+    removeFromCart,
+    cartTotal,
+    cartCount,
+  } = useCart();
   const navigate = useNavigate();
 
   const handleCheckout = () => {
     closeCart();
-    navigate('/checkout');
+    navigate("/checkout");
   };
 
   return (
     <>
-      <div className={`cart-overlay ${isCartOpen ? 'open' : ''}`} onClick={closeCart} />
-      <div className={`cart-drawer-container ${isCartOpen ? 'open' : ''}`}>
+      <div
+        className={`cart-overlay ${isCartOpen ? "open" : ""}`}
+        onClick={closeCart}
+      />
+      <div className={`cart-drawer-container ${isCartOpen ? "open" : ""}`}>
         <div className="cart-drawer-header">
-          <h2>{t("shoppingCart")} <span>({cartCount})</span></h2>
-          <button className="close-drawer-btn" onClick={closeCart}>✕</button>
+          <h2>
+            {t("shoppingCart")} <span>({cartCount})</span>
+          </h2>
+          <button className="close-drawer-btn" onClick={closeCart}>
+            ✕
+          </button>
         </div>
 
         <div className="cart-drawer-body">
@@ -27,29 +42,81 @@ export default function CartDrawer() {
               <div className="cart-empty-icon">🛒</div>
               <h3>{t("cartEmptyMsg")}</h3>
               <p>{t("notAddedAnything")}</p>
-              <button className="btn btn-primary mt-4" onClick={closeCart}>{t("startShopping")}</button>
+              <button className="btn btn-primary mt-4" onClick={closeCart}>
+                {t("startShopping")}
+              </button>
             </div>
           ) : (
             <div className="cart-drawer-items">
-              {items.map(item => (
-                <div key={`${item.product._id}-${item.size}-${item.color}`} className="drawer-item">
+              {items.map((item) => (
+                <div
+                  key={`${item.product._id}-${item.size}-${item.color}`}
+                  className="drawer-item"
+                >
                   <div className="drawer-item-img">
-                    <img src={item.product.images?.[0]} alt={item.product.name} />
+                    <img
+                      src={item.product.images?.[0]}
+                      alt={item.product.name}
+                    />
                   </div>
                   <div className="drawer-item-info">
                     <div className="drawer-item-header">
-                      <Link to={`/products/${item.product._id}`} onClick={closeCart} className="drawer-item-name">{item.product.name}</Link>
-                      <button className="drawer-item-remove" onClick={() => removeFromCart(item.product._id, item.size, item.color)}>✕</button>
+                      <Link
+                        to={`/products/${item.product._id}`}
+                        onClick={closeCart}
+                        className="drawer-item-name"
+                      >
+                        {item.product.name}
+                      </Link>
+                      <button
+                        className="drawer-item-remove"
+                        onClick={() =>
+                          removeFromCart(
+                            item.product._id,
+                            item.size,
+                            item.color,
+                          )
+                        }
+                      >
+                        ✕
+                      </button>
                     </div>
-                    <div className="drawer-item-meta">{t("sizeLabel")} {item.size} {item.color ? `· ${item.color}` : ''}</div>
-                    
+                    <div className="drawer-item-meta">
+                      {t("sizeLabel")} {item.size}{" "}
+                      {item.color ? `· ${item.color}` : ""}
+                    </div>
+
                     <div className="drawer-item-bottom">
                       <div className="drawer-qty-stepper">
-                        <button onClick={() => updateQty(item.product._id, item.size, item.color, item.qty - 1)}>-</button>
+                        <button
+                          onClick={() =>
+                            updateQty(
+                              item.product._id,
+                              item.size,
+                              item.color,
+                              item.qty - 1,
+                            )
+                          }
+                        >
+                          -
+                        </button>
                         <span>{item.qty}</span>
-                        <button onClick={() => updateQty(item.product._id, item.size, item.color, item.qty + 1)}>+</button>
+                        <button
+                          onClick={() =>
+                            updateQty(
+                              item.product._id,
+                              item.size,
+                              item.color,
+                              item.qty + 1,
+                            )
+                          }
+                        >
+                          +
+                        </button>
                       </div>
-                      <div className="drawer-item-price">{item.product.price} {t("egp")}</div>
+                      <div className="drawer-item-price">
+                        {item.product.price} {t("egp")}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -62,10 +129,15 @@ export default function CartDrawer() {
           <div className="cart-drawer-footer">
             <div className="drawer-subtotal">
               <span>{t("subtotal")}</span>
-              <span className="drawer-total-price">{cartTotal} {t("egp")}</span>
+              <span className="drawer-total-price">
+                {cartTotal} {t("egp")}
+              </span>
             </div>
             <p className="drawer-tax-note">{t("taxesShipping")}</p>
-            <button className="btn btn-primary drawer-checkout-btn" onClick={handleCheckout}>
+            <button
+              className="btn btn-primary drawer-checkout-btn"
+              onClick={handleCheckout}
+            >
               {t("proceedToCheckout")}
             </button>
           </div>

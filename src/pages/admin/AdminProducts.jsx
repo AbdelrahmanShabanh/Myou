@@ -419,7 +419,10 @@ export default function AdminProducts() {
               </div>
 
               <div className="form-group" style={{ marginTop: "1rem" }}>
-                <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <label
+                  className="form-label"
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                >
                   <input
                     type="checkbox"
                     checked={hasColors}
@@ -440,9 +443,11 @@ export default function AdminProducts() {
                       placeholder="Enter colors separated by comma (e.g. red, blue, green)"
                       value={(formData.colors || []).join(", ")}
                       onChange={(e) => {
-                        setFormData((prev) => ({ 
-                          ...prev, 
-                          colors: e.target.value ? e.target.value.split(",").map(c => c.trim()) : [] 
+                        setFormData((prev) => ({
+                          ...prev,
+                          colors: e.target.value
+                            ? e.target.value.split(",").map((c) => c.trim())
+                            : [],
                         }));
                       }}
                     />

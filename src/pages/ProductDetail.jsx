@@ -51,7 +51,7 @@ export default function ProductDetail() {
     } else {
       setSizeError(false);
     }
-    
+
     if (product.colors && product.colors.length > 0 && !selectedColor) {
       setColorError(true);
       hasErr = true;
@@ -208,10 +208,13 @@ export default function ProductDetail() {
               <div className="section-head">
                 <span className="section-label">Select Color</span>
               </div>
-              <div className="color-selector" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <div
+                className="color-selector"
+                style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}
+              >
                 {product.colors.map((color) => {
                   const cleanedStr = color.trim();
-                  // A simple generic regex matching basic english color names or hex matching would work, 
+                  // A simple generic regex matching basic english color names or hex matching would work,
                   // but we use the exact string as background too if valid CSS color like "blue" or "red".
                   return (
                     <button
@@ -219,12 +222,19 @@ export default function ProductDetail() {
                       className={`color-btn-lg ${selectedColor === color ? "active" : ""}`}
                       style={{
                         backgroundColor: cleanedStr,
-                        padding: '10px 20px',
-                        border: selectedColor === color ? '2px solid black' : '1px solid #ccc',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        color: ['white', 'yellow', 'cyan', 'lime'].includes(cleanedStr.toLowerCase()) ? 'black' : 'white',
-                        fontWeight: 'bold',
+                        padding: "10px 20px",
+                        border:
+                          selectedColor === color
+                            ? "2px solid black"
+                            : "1px solid #ccc",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        color: ["white", "yellow", "cyan", "lime"].includes(
+                          cleanedStr.toLowerCase(),
+                        )
+                          ? "black"
+                          : "white",
+                        fontWeight: "bold",
                         opacity: 0.9,
                       }}
                       onClick={() => {
@@ -237,7 +247,9 @@ export default function ProductDetail() {
                   );
                 })}
               </div>
-              {colorError && <p className="error-text">Please select a color</p>}
+              {colorError && (
+                <p className="error-text">Please select a color</p>
+              )}
             </div>
           )}
 

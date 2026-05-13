@@ -228,7 +228,11 @@ export default function Checkout() {
         productId: item.product._id,
         name: item.product.name,
         size: item.size,
-      color: item.color,
+        color: item.color,
+        qty: item.qty,
+        price: item.product.price,
+        image: item.product.images?.[0] || "",
+      }));
 
       await fetch("/api/orders", {
         method: "POST",
