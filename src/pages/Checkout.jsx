@@ -712,7 +712,7 @@ export default function Checkout() {
                   وإرسالها على الواتساب مع الطلب لتأكيد الدفع.
                 </p>
                 <a
-                  href="#"
+                  href="https://ipn.eg/S/merihan_yousry87/instapay/0h7tvw"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setHasCopiedInstapay(true)}
