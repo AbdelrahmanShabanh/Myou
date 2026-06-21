@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
 import { useLanguage } from "../context/LanguageContext.jsx";
+import { cldSrc, CLD_W } from "../utils/cloudinary.js";
 
 export default function ProductCard({ product }) {
   const { t } = useLanguage();
@@ -35,10 +36,11 @@ export default function ProductCard({ product }) {
       <div className="product-img-wrap">
         {mainImg ? (
           <img
-            src={mainImg}
+            src={cldSrc(mainImg, CLD_W.CARD)}
             alt={product.name}
             className="product-img"
             loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="product-img-placeholder">

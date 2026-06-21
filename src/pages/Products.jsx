@@ -4,6 +4,7 @@ import { useLanguage } from "../context/LanguageContext.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import SkeletonCard from "../components/SkeletonCard.jsx";
 import FilterSidebar from "../components/FilterSidebar.jsx";
+import { cldSrc, CLD_W } from "../utils/cloudinary.js";
 
 export default function Products() {
   const { t } = useLanguage();
@@ -141,9 +142,11 @@ export default function Products() {
                   className="cat-card sub-card"
                 >
                   <img
-                    src={sub.image || "/collections/caps.jpg"}
+                    src={cldSrc(sub.image, CLD_W.CATEGORY_CARD) || "/collections/caps.jpg"}
                     alt={sub.name}
                     className="cat-img"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="cat-overlay">
                     <h3 className="cat-title">{sub.name}</h3>

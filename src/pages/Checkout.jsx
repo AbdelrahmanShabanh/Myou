@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
-
 import { useLanguage } from "../context/LanguageContext.jsx";
+import { cldSrc, CLD_W } from "../utils/cloudinary.js";
 
 const WHATSAPP_NUMBER = "201070831335";
 
@@ -830,7 +830,7 @@ export default function Checkout() {
                   }}
                 >
                   <img
-                    src={item.product.images?.[0]}
+                    src={cldSrc(item.product.images?.[0], CLD_W.THUMBNAIL)}
                     alt={item.product.name}
                     style={{
                       width: "100%",
@@ -838,6 +838,7 @@ export default function Checkout() {
                       objectFit: "cover",
                     }}
                     loading="lazy"
+                    decoding="async"
                   />
                   <span
                     style={{

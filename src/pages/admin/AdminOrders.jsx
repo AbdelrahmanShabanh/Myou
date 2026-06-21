@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { cldSrc, CLD_W } from "../../utils/cloudinary.js";
 
 const STATUS_CONFIG = {
   pending:   { label: "Pending",   bg: "rgba(234,179,8,0.15)",   color: "#facc15", border: "rgba(234,179,8,0.3)" },
@@ -138,9 +139,11 @@ function OrderCard({ order, onStatusChange }) {
                 <div key={idx} className="ao-item-row">
                   {item.image && (
                     <img
-                      src={item.image}
+                      src={cldSrc(item.image, CLD_W.THUMBNAIL)}
                       alt={item.name}
                       className="ao-item-img"
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => { e.target.style.display = "none"; }}
                     />
                   )}

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext.jsx";
 import DiscountScroller from "../components/DiscountScroller.jsx";
 import ProductCard from "../components/ProductCard.jsx";
+import { cldSrc, CLD_W } from "../utils/cloudinary.js";
 
 export default function Home() {
   const { t } = useLanguage();
@@ -70,6 +71,8 @@ export default function Home() {
               src="/collections/caps.jpg"
               alt="Streetwear Hero"
               className="hero-img"
+              loading="eager"
+              fetchpriority="high"
             />
           </picture>
         </div>
@@ -134,9 +137,11 @@ export default function Home() {
                     className="cat-card"
                   >
                     <img
-                      src={cat.image || "/collections/caps.jpg"}
+                      src={cldSrc(cat.image, CLD_W.CATEGORY_CARD) || "/collections/caps.jpg"}
                       alt={cat.name}
                       className="cat-img"
+                      loading="lazy"
+                      decoding="async"
                     />
                     <div className="cat-overlay">
                       <h3 className="cat-title">{cat.name}</h3>

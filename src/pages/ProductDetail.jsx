@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
 import { useLanguage } from "../context/LanguageContext.jsx";
+import { cldSrc, CLD_W } from "../utils/cloudinary.js";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -129,9 +130,11 @@ export default function ProductDetail() {
         <div className="detail-gallery">
           <div className="main-image-wrap">
             <img
-              src={product.images?.[mainImage] || ""}
+              src={cldSrc(product.images?.[mainImage], CLD_W.DETAIL_MAIN) || ""}
               alt={product.name}
               className="main-image"
+              loading="eager"
+              fetchpriority="high"
             />
             {!inStock && (
               <div className="sold-out-badge">{t("outOfStock")}</div>
@@ -149,9 +152,11 @@ export default function ProductDetail() {
                   onClick={() => setMainImage(i)}
                 >
                   <img
-                    src={img}
+                    src={cldSrc(img, CLD_W.DETAIL_THUMB)}
                     alt={`Thumbnail ${i + 1}`}
                     className="thumb-img"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </button>
               ))}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { cldSrc, CLD_W } from "../../utils/cloudinary.js";
 
 export default function AdminCategories() {
   const [categories, setCategories] = useState([]);
@@ -199,7 +200,7 @@ export default function AdminCategories() {
                 <td>
                   {c.image ? (
                     <img
-                      src={c.image}
+                      src={cldSrc(c.image, CLD_W.THUMBNAIL)}
                       alt={c.name}
                       style={{
                         width: 40,
@@ -207,6 +208,8 @@ export default function AdminCategories() {
                         objectFit: "cover",
                         borderRadius: "4px",
                       }}
+                      loading="lazy"
+                      decoding="async"
                     />
                   ) : (
                     "-"
@@ -357,7 +360,7 @@ export default function AdminCategories() {
                 )}
                 {image && (
                   <img
-                    src={image}
+                    src={cldSrc(image, CLD_W.ADMIN_PREVIEW)}
                     alt="preview"
                     style={{
                       width: "60px",
@@ -366,6 +369,7 @@ export default function AdminCategories() {
                       marginTop: "10px",
                       borderRadius: "8px",
                     }}
+                    loading="lazy"
                   />
                 )}
               </div>

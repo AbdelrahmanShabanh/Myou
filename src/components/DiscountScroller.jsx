@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { cldSrc, CLD_W } from '../utils/cloudinary.js';
 
 export default function DiscountScroller({ discounts }) {
   const scrollRef = useRef(null);
@@ -35,9 +36,9 @@ export default function DiscountScroller({ discounts }) {
             color: d.textColor || '#E91E8C', flexShrink: 0, display: 'block'
           }}>
             {d.image && (
-              <img src={d.image} alt={d.title} style={{
+              <img src={cldSrc(d.image, CLD_W.DISCOUNT)} alt={d.title} style={{
                 width: '100%', height: 150, objectFit: 'cover', borderRadius: 12, marginBottom: 12
-              }} />
+              }} loading="lazy" decoding="async" />
             )}
             {d.discountPercent && (
               <span style={{

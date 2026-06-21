@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { cldSrc, CLD_W } from '../../utils/cloudinary.js';
 import { Link } from 'react-router-dom';
 
 export default function AdminDiscounts() {
@@ -170,7 +171,7 @@ export default function AdminDiscounts() {
             {discounts.map(d => (
               <tr key={d._id}>
                 <td>
-                  {d.image ? <img src={d.image} alt={d.title} style={{width: 60, height: 40, objectFit: 'cover', borderRadius: '4px'}}/> : '-'}
+                  {d.image ? <img src={cldSrc(d.image, CLD_W.THUMBNAIL)} alt={d.title} style={{width: 60, height: 40, objectFit: 'cover', borderRadius: '4px'}} loading="lazy" decoding="async" /> : '-'}
                 </td>
                 <td><strong>{d.title}</strong></td>
                 <td><span className="mono-id">{d.code}</span></td>
@@ -221,7 +222,7 @@ export default function AdminDiscounts() {
                 <label className="form-label">Banner Image *</label>
                 <input type="file" accept="image/*" onChange={handleImageUpload} />
                 {uploading && <span style={{fontSize: '12px', color: 'var(--color-accent)'}}>Uploading...</span>}
-                {image && <img src={image} alt="preview" style={{width: '120px', height: '60px', objectFit: 'cover', marginTop: '10px', borderRadius: '8px'}}/>}
+                {image && <img src={cldSrc(image, CLD_W.ADMIN_PREVIEW)} alt="preview" style={{width: '120px', height: '60px', objectFit: 'cover', marginTop: '10px', borderRadius: '8px'}} loading="lazy" />}
               </div>
 
               <div className="form-group">

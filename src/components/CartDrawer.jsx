@@ -1,6 +1,7 @@
 import { useCart } from "../context/CartContext.jsx";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext.jsx";
+import { cldSrc, CLD_W } from "../utils/cloudinary.js";
 
 export default function CartDrawer() {
   const { t } = useLanguage();
@@ -55,8 +56,10 @@ export default function CartDrawer() {
                 >
                   <div className="drawer-item-img">
                     <img
-                      src={item.product.images?.[0]}
+                      src={cldSrc(item.product.images?.[0], CLD_W.THUMBNAIL)}
                       alt={item.product.name}
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                   <div className="drawer-item-info">

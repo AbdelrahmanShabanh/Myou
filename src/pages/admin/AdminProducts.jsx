@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { cldSrc, CLD_W } from "../../utils/cloudinary.js";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -221,7 +222,7 @@ export default function AdminProducts() {
               <tr key={p._id}>
                 <td>
                   <img
-                    src={p.images?.[0] || "placeholder"}
+                    src={cldSrc(p.images?.[0], CLD_W.THUMBNAIL) || "placeholder"}
                     alt=""
                     style={{
                       width: "40px",
@@ -230,6 +231,8 @@ export default function AdminProducts() {
                       borderRadius: "4px",
                       background: "#111",
                     }}
+                    loading="lazy"
+                    decoding="async"
                   />
                 </td>
                 <td>
@@ -597,7 +600,7 @@ export default function AdminProducts() {
                 <div className="img-upload-grid">
                   {formData.images.map((img, i) => (
                     <div key={i} className="img-preview">
-                      <img src={img} alt="" />
+                      <img src={cldSrc(img, CLD_W.ADMIN_PREVIEW)} alt="" loading="lazy" decoding="async" />
                       <button type="button" onClick={() => removeImage(i)}>
                         ✕
                       </button>

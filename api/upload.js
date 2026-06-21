@@ -16,24 +16,30 @@ export default async function handler(req, res) {
 
     const result = await cloudinary.uploader.upload(image, {
       folder: "genzfront-products",
-      // Ensure transformation uses best practices
+      // Request auto quality & format on delivery (not baked into the stored file)
       transformation: [{ quality: "auto", fetch_format: "auto" }],
     });
 
-    // Cloudinary might return secure_url without explicit auto-format tags if added in transformation depending on settings.
-    // We can manually add them to the URL to be 100% sure we are delivering f_auto,q_auto.
-    let optimizedUrl = result.secure_url;
-    if (
-      optimizedUrl.includes("res.cloudinary.com") &&
-      !optimizedUrl.includes("f_auto")
-    ) {
-      optimizedUrl = optimizedUrl.replace(
-        /(res\.cloudinary\.com\/.*?\/image\/upload\/)/i,
+    // Build a stable, CDN-cacheable URL:
+    //  1. Strip the version segment (v1234567890/) – it changes on every upload
+    //     and causes CDN cache misses for the same asset.
+    //  2. Inject f_auto,q_auto so browsers always receive WebP/AVIF at the
+    //     optimal quality without us having to duplicate transformation params
+    //     everywhere in the frontend.
+    let url = result.secure_url;
+
+    // Remove version token: …/upload/v1234567890/folder/… → …/upload/folder/…
+    url = url.replace(/(\/image\/upload\/)v\d+\//, "$1");
+
+    // Inject f_auto,q_auto if not already present
+    if (!url.includes("f_auto")) {
+      url = url.replace(
+        /(\/image\/upload\/)/i,
         "$1f_auto,q_auto/",
       );
     }
 
-    return res.status(200).json({ url: optimizedUrl });
+    return res.status(200).json({ url });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
