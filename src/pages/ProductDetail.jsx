@@ -362,7 +362,7 @@ export default function ProductDetail() {
               ✕
             </button>
             <img
-              src="/size-chart.jpg"
+              src="/size-chart.webp"
               alt="Size Chart"
               className="size-chart-img"
             />

@@ -142,7 +142,7 @@ export default function Products() {
                   className="cat-card sub-card"
                 >
                   <img
-                    src={cldSrc(sub.image, CLD_W.CATEGORY_CARD) || "/collections/caps.jpg"}
+                    src={cldSrc(sub.image, CLD_W.CATEGORY_CARD) || "/collections/caps.webp"}
                     alt={sub.name}
                     className="cat-img"
                     loading="lazy"

@@ -9,12 +9,12 @@ const defaultSizes = [
 ];
 
 const imgList = [
-  '/collections/caps.jpg',
-  '/collections/kimono.jpg',
-  '/collections/scarves.jpg',
-  '/collections/cover up.jpg',
-  '/collections/_SHG8409.jpg',
-  '/collections/stain scarves1.jpg'
+  '/collections/caps.webp',
+  '/collections/kimono.webp',
+  '/collections/scarves.webp',
+  '/collections/cover up.webp',
+  '/collections/_SHG8409.webp',
+  '/collections/stain scarves1.webp'
 ];
 
 const getRandomImg = () => imgList[Math.floor(Math.random() * imgList.length)];
@@ -33,7 +33,7 @@ const sampleProducts = [
     category: 'accessories',
     sizes: [{ size: 'OS', stock: 50 }],
     stock: 50,
-    images: ['/collections/stain scarves1.jpg', '/collections/scarves.jpg'],
+    images: ['/collections/stain scarves1.webp', '/collections/scarves.webp'],
     material: '100% Satin',
     featured: true
   },
@@ -44,7 +44,7 @@ const sampleProducts = [
     category: 'accessories',
     sizes: [{ size: 'OS', stock: 30 }],
     stock: 30,
-    images: ['/collections/caps.jpg'],
+    images: ['/collections/caps.webp'],
     material: 'Cotton Canvas',
     featured: false
   },
@@ -55,7 +55,7 @@ const sampleProducts = [
     category: 'modest-wear',
     sizes: defaultSizes,
     stock: 40,
-    images: ['/collections/kimono.jpg'],
+    images: ['/collections/kimono.webp'],
     material: 'Linen Blend',
     featured: true
   },
@@ -66,7 +66,7 @@ const sampleProducts = [
     category: 'swimwear',
     sizes: defaultSizes,
     stock: 40,
-    images: ['/collections/cover up.jpg', '/collections/cover up sada.jpg'],
+    images: ['/collections/cover up.webp', '/collections/cover up sada.webp'],
     material: 'Chiffon',
     featured: true
   },
@@ -77,7 +77,7 @@ const sampleProducts = [
     category: 'swimwear',
     sizes: defaultSizes,
     stock: 40,
-    images: ['/collections/burkini.jpg'],
+    images: ['/collections/burkini.webp'],
     material: 'Water-resistant nylon',
     featured: false
   },
@@ -88,7 +88,7 @@ const sampleProducts = [
     category: 'modest-wear',
     sizes: defaultSizes,
     stock: 40,
-    images: ['/collections/_SHG8409.jpg'],
+    images: ['/collections/_SHG8409.webp'],
     material: 'Premium Blend',
     featured: true
   }

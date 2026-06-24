@@ -65,10 +65,10 @@ export default function Home() {
           <picture>
             <source
               media="(min-width: 768px)"
-              srcSet="/collections/_SHG8409.jpg"
+              srcSet="/collections/_SHG8409.webp"
             />
             <img
-              src="/collections/caps.jpg"
+              src="/collections/caps.webp"
               alt="Streetwear Hero"
               className="hero-img"
               loading="eager"
@@ -137,7 +137,7 @@ export default function Home() {
                     className="cat-card"
                   >
                     <img
-                      src={cldSrc(cat.image, CLD_W.CATEGORY_CARD) || "/collections/caps.jpg"}
+                      src={cldSrc(cat.image, CLD_W.CATEGORY_CARD) || "/collections/caps.webp"}
                       alt={cat.name}
                       className="cat-img"
                       loading="lazy"

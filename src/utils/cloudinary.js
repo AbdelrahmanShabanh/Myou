@@ -30,7 +30,7 @@ export function cldSrc(src, width) {
   const parts = withoutVersion.split("/upload/");
   if (parts.length !== 2) return src; // unexpected format, leave untouched
 
-  const transforms = `f_auto,q_auto${width ? `,w_${width},c_limit` : ""}`;
+   const transforms = `f_webp,q_auto${width ? `,w_${width},c_limit` : ""}`;
   return `${parts[0]}/upload/${transforms}/${parts[1]}`;
 }
 
